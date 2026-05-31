@@ -22,6 +22,7 @@ Good news: they **share the same settings**. Everything this wizard sets up thro
 1. Download it for Mac: **https://claude.ai/download**
 2. Open the downloaded file and drag **Claude** into your Applications folder.
 3. Launch **Claude** from Applications and **sign in** with your account.
+   - If macOS says *"Claude can't be opened because it is from an unidentified developer"*, right-click the app → **Open** → **Open** again. (You only do this once.)
 4. Click the **Code** tab at the top. If it asks you to upgrade, you're on the free plan — you'll need a paid one (see above).
 
 ✅ You can now use Claude Code with a nice interface.
@@ -53,6 +54,23 @@ Good news: they **share the same settings**. Everything this wizard sets up thro
 
 ## Part 2 — Run the setup wizard
 
+### First: make your "home base" folder
+Claude works best when everything you do lives in **one folder you point it at**. Make it now so it's ready when the wizard asks:
+1. Open **Finder**.
+2. Go to your **Desktop**.
+3. Right-click an empty spot → **New Folder**. Name it **`Projects`** (or anything you like).
+4. Open it and make **one folder inside it** named **`vault`** (this is where your notes/second-brain will live — it has to be its own folder, not the Desktop itself).
+
+So you'll have:
+```
+Desktop/
+  Projects/        ← your home base (you point Claude here for everything)
+    vault/         ← your notes / "second brain"
+```
+When the wizard later asks for your **project folder**, give it `Desktop/Projects`. When it asks for your **vault folder**, give it `Desktop/Projects/vault`.
+
+**How to type a folder path when asked:** the easiest way — type nothing, just **drag the folder from Finder into the Terminal** and it fills in the path for you. Or type it by hand like `~/Desktop/Projects` (the `~` means "my home folder").
+
 ### 1. Unzip the folder
 - Double-click `claude-onboard.zip` (it's probably in your Downloads). A folder called `claude-onboard` appears.
 
@@ -72,9 +90,43 @@ node bin/cli.js
 ```
 
 ### 4. Answer the questions
-The wizard now walks you through everything below. Use **arrow keys** to move, **Space** to tick/untick checkboxes, and **Return** to confirm.
+The wizard now walks you through everything below. Use **arrow keys** to move, **Space** to tick/untick checkboxes, and **Return** to confirm. When it asks for a folder, use your home-base folder from above (drag it in, or type `~/Desktop/Projects`).
 
 If anything ever goes wrong, it asks **Retry / Skip / Stop** — nothing breaks. Just pick one (or text Nick what it said).
+
+---
+
+## Part 3 — Start actually using Claude
+
+### 1. Restart Claude so the new plugins load
+Newly installed plugins activate on a fresh start. **Fully quit the Claude app** (⌘ Q) and reopen it. If you also use the terminal version, close that window and open a new one.
+
+### 2. Open your home-base folder in the app
+1. Open the **Claude** app → click the **Code** tab.
+2. Click **Select folder** and choose **`Desktop/Projects`** (your home base).
+3. That's it — Claude now sees your instructions (CLAUDE.md), your notes vault, and your plugins automatically.
+
+### 3. Kick off with your North Star
+In the prompt box, type:
+```
+/om-standup
+```
+Claude reads your North Star goals and gives you a focused daily kickoff, then asks what you want to work on. Use this to start every session.
+
+### From now on
+- Keep your work inside **`Desktop/Projects`** so Claude always has your context.
+- Just talk to it in plain English in the **Code** tab — "build me a webpage that…", "fix this", "explain this file."
+- Re-running the wizard later is safe; it won't duplicate anything.
+
+---
+
+## Troubleshooting (if a step errors)
+
+- **"command not found: claude"** → close Terminal, open a new window, try again. If still missing, re-run the install line from Part 1 Step B.
+- **macOS blocks the app or installer** ("unidentified developer" / "cannot be opened") → right-click the app → **Open** → **Open** again. Or **System Settings → Privacy & Security** → scroll down → **Open Anyway**.
+- **A wizard step fails** → pick **Skip** to keep going, or **Retry**. Then screenshot what it said and send it to Nick. Nothing is broken — the wizard backs up files and never deletes your notes.
+- **It asks for a paid plan** → Claude Code needs Pro/Max/Team/Enterprise; the free plan won't work.
+- **Want to start over?** → just run `node bin/cli.js` again. It's safe to re-run.
 
 ---
 
