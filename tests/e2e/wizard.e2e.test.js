@@ -12,6 +12,7 @@ import claudemd from '../../src/steps/04-claudemd.js';
 import hooks from '../../src/steps/05-hooks.js';
 import secondbrain from '../../src/steps/06-secondbrain.js';
 import northstar from '../../src/steps/06b-northstar.js';
+import qmd from '../../src/steps/06c-qmd.js';
 import loops from '../../src/steps/07-loops.js';
 import summary from '../../src/steps/08-summary.js';
 
@@ -37,7 +38,7 @@ describe('end-to-end wizard run (fake io, fake run, temp dirs)', () => {
     const run = async (cmd, args) => ({ ok: true, code: 0, stdout: (args[1] === 'list' ? '' : 'ok 1.0'), stderr: '' });
     const env = { os: 'linux', pkgManager: 'apt', home: dir, stamp: 'S1', today: '2026-05-31', run, io };
     const ctx = { env, answers: {}, results: {} };
-    const steps = [claudeCheck, prereqs, plugins, claudemd, hooks, secondbrain, northstar, loops, summary];
+    const steps = [claudeCheck, prereqs, plugins, claudemd, hooks, secondbrain, northstar, qmd, loops, summary];
 
     const out = await runWizard(steps, ctx, { decide: async () => 'abort', ui: noUI() });
 
