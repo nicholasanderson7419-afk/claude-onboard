@@ -113,7 +113,10 @@ export default {
 
 ### Step 0 — Claude Code check
 1. `claude` on PATH? If not → explain + official install link, exit gracefully.
-2. Authenticated? Probe `claude mcp list`. If auth error → guide login, resume.
+2. Authenticated? **`claude mcp list` is NOT a valid auth probe** (it only reads
+   local MCP config, no account auth). Use a real probe: a minimal headless
+   round-trip (`claude -p "ok"` with a short timeout) or a credentials check.
+   If logged out → guide login, resume. *(exact probe validated at plan time.)*
 3. Both pass → continue.
 
 ### Step 1 — Environment scan
@@ -125,10 +128,12 @@ package manager found, what's already installed). Builds `env`, passed to all st
   (Debian). If missing → show exact get-it steps, mark dependent installs
   "manual," never crash.
 - Tiers:
-  - **Essential:** git, gh CLI.
-  - **Common (on demand):** ffmpeg — only if user opts into claude-video-vision.
-    Justification (does video-vision actually need ffmpeg?) verified at plan
-    time, not assumed.
+  - **Essential:** git only. (`gh` CLI moved to on-demand — see below — since
+    its `gh-cli` plugin is optional-tier; don't install gh for users who skip it.)
+  - **Common (on demand):** `gh` CLI — installed only if user selects the
+    `gh-cli` or `code-review` plugin. ffmpeg — only if user opts into
+    claude-video-vision (the ffmpeg dependency is verified at plan time, not
+    assumed).
   - **Advanced (opt-in, warned about size/admin):** WSL/Ubuntu, Docker, Python+uv.
 - Each install: shell out → capture output → verify (`git --version`, etc.).
 
@@ -154,36 +159,56 @@ Command: `claude plugin marketplace add <owner/repo-or-url>`
   agentic-actions-auditor, differential-review, gh-cli, code-review,
   claude-video-vision, create-viral-content.
 
-Command: `claude plugin install <name>@<marketplace>`
-Verify: parse `claude plugin list` → name present + `enabled`.
+Command: `claude plugin install <name>@<marketplace>` (default scope `user` =
+global — confirmed via `plugin install --help`).
+Verify: parse `claude plugin list` → name **present + installed**. Do NOT
+fail on not-yet-`enabled`: `plugin update --help` notes "restart required to
+apply," so a freshly installed plugin may show inactive until restart. Verify
+checks *installed*; report "active after restart" where applicable.
 
 ### Step 4 — CLAUDE.md (after plugins so rules match)
 Short interview (what are you building? how cautious? folder conventions?).
-Writes global `~/.claude/CLAUDE.md` + project `./CLAUDE.md` from template,
-including rules tuned to the chosen plugins (e.g. superpowers/caveman usage).
+**First ask/confirm the target project directory** — the wizard's cwd is not
+assumed to be the user's project. Writes global `~/.claude/CLAUDE.md` + a
+project `CLAUDE.md` in the confirmed dir, from template, including rules tuned
+to the chosen plugins (e.g. superpowers/caveman usage).
 
 ### Step 5 — Hooks (defined set, not vapor)
-Enable a small, explained set written to `~/.claude/settings.json`:
-- **SessionStart** hook that loads project context (CLAUDE.md / North Star).
+Enable a small, explained set written to `~/.claude/settings.json`. Hooks must
+do something Claude does NOT already do (Claude auto-loads CLAUDE.md, so a
+"load CLAUDE.md" hook is redundant — excluded). Candidate set:
+- **SessionStart** hook that injects *dynamic* context Claude lacks: current
+  date, `git status`/branch, or a North Star line — not a re-print of CLAUDE.md.
 - Optional **UserPromptSubmit** reminder hook.
 Per-OS command syntax (PowerShell on Windows, bash on Mac/Linux).
 Exact hook list finalized in the implementation plan.
 
 ### Step 6 — Second Brain bundle
-The real Obsidian↔Claude wiring (grounded in Nick's live config):
-1. **Vault filesystem MCP:** `claude mcp add obsidian-vault -- npx -y
+The real Obsidian↔Claude wiring (grounded in Nick's live config). **Both servers
+added at `-s user` scope** — confirmed `mcp add` defaults to `local` (cwd-only),
+which would NOT make the second brain global:
+1. **Vault filesystem MCP:** `claude mcp add obsidian-vault -s user -- npx -y
    @modelcontextprotocol/server-filesystem <VAULT_PATH>` — **wizard asks for
-   VAULT_PATH.**
-2. **Memory server (optional):** `claude mcp add memory -- npx -y
-   @modelcontextprotocol/server-memory` (knowledge-graph store, separate from
-   the vault).
+   VAULT_PATH.** ⚠️ **Security:** this grants Claude full read/write over that
+   path. Wizard warns and recommends a dedicated vault folder — never a broad
+   path (home dir, whole Desktop).
+2. **Memory server (offered, default off):** `claude mcp add memory -s user --
+   npx -y @modelcontextprotocol/server-memory` (knowledge-graph store, separate
+   from the vault).
 3. **Vault skeleton:** scaffold `brain/`, `wiki/concepts/`, `raw/` + seed
    `North Star.md`, `MEMORY.md`. Create-missing only; never touch existing notes.
 4. **CLAUDE.md wiki-pattern rules:** append Karpathy-pattern rules (wikilinks,
    raw→concepts, Claude maintains the wiki).
 
-### Step 7 — Loops / automation (optional)
-Set up any standing automations the user wants (`/loop`, scheduled routines).
+### Step 7 — Loops / automation (optional, re-scoped)
+**A shell wizard cannot create a `/loop`** — that's an in-session Claude command.
+So this step does NOT promise `/loop`. What it CAN do deterministically:
+- Write an **OS-level scheduled task** (Windows Task Scheduler / cron) that runs
+  `claude -p "<routine prompt>"` on a schedule, if the user wants a recurring
+  automation.
+- Drop a documented **routine prompt stub** the user can paste into a session.
+If neither is wanted, skip. (If even this proves fragile at plan time, cut Step 7
+from v1 entirely — flagged as a candidate cut.)
 
 ### Step 8 — Summary report
 Green/red table of everything done, each row showing its real verification proof
@@ -202,8 +227,8 @@ Outputs: real files + installed plugins/MCP.
 | `~/.claude/settings.json` | merge hooks block | array-aware dedupe — match hook by event+command, skip if present |
 | marketplaces | `claude plugin marketplace add <source>` | detect-then-skip if present |
 | plugins | `claude plugin install <name>@<mkt>` | verify via `claude plugin list` |
-| memory MCP | `claude mcp add memory -- npx -y @modelcontextprotocol/server-memory` | verify `mcp list` shows Connected |
-| vault MCP | `claude mcp add obsidian-vault -- npx -y @modelcontextprotocol/server-filesystem <VAULT_PATH>` | wizard asks VAULT_PATH; verify Connected |
+| memory MCP (offered, default off) | `claude mcp add memory -s user -- npx -y @modelcontextprotocol/server-memory` | `-s user` = global; verify `mcp list` Connected |
+| vault MCP | `claude mcp add obsidian-vault -s user -- npx -y @modelcontextprotocol/server-filesystem <VAULT_PATH>` | `-s user`; wizard asks VAULT_PATH + warns broad-path security; verify Connected |
 | vault skeleton | scaffold folders + seed notes | create-missing only; never overwrite notes |
 
 **Guarantees:**
@@ -247,6 +272,10 @@ Outputs: real files + installed plugins/MCP.
 3. **ffmpeg ↔ claude-video-vision dependency** — verify it's actually required
    before listing it.
 4. **Exact hook list + snippets** — finalize in implementation plan.
+5. **Auth probe method** — confirm a reliable headless logged-in/out check
+   (minimal `claude -p` vs credentials inspection).
+6. **Step 7 viability** — confirm OS scheduled-task path works cross-platform;
+   else cut Step 7 from v1.
 
 ---
 
