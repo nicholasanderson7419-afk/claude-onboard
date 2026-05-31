@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdtempSync, writeFileSync, readFileSync, existsSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { backupFile, appendSection, mergeHooks } from '../../src/lib/writers.js';
+import { backupFile, appendSection, mergeHooks, scaffoldTree } from '../../src/lib/writers.js';
 
 let dir;
 beforeEach(() => { dir = mkdtempSync(join(tmpdir(), 'co-')); });
@@ -81,5 +81,30 @@ describe('mergeHooks', () => {
     const withModel = { model: 'opus', ...existing };
     const out = mergeHooks(withModel, {});
     expect(out.model).toBe('opus');
+  });
+});
+
+describe('scaffoldTree', () => {
+  it('creates missing directories', () => {
+    const tree = { a: { b: { c: {} } } };
+    const root = join(dir, 'nested', 'tree');
+    scaffoldTree(root, tree);
+    expect(existsSync(join(root, 'a', 'b', 'c'))).toBe(true);
+  });
+
+  it('creates seed files without overwriting', () => {
+    const tree = { '.claude': { 'README.md': 'welcome' } };
+    const root = join(dir, 'project');
+    scaffoldTree(root, tree);
+    expect(existsSync(join(root, '.claude', 'README.md'))).toBe(true);
+    expect(readFileSync(join(root, '.claude', 'README.md'), 'utf8')).toBe('welcome');
+  });
+
+  it('does not overwrite existing files', () => {
+    const target = join(dir, 'config');
+    writeFileSync(target, 'existing');
+    const tree = { 'config': 'new' };
+    scaffoldTree(dir, tree);
+    expect(readFileSync(target, 'utf8')).toBe('existing');
   });
 });

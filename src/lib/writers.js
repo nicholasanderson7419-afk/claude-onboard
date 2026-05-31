@@ -1,4 +1,4 @@
-import { existsSync, copyFileSync, constants } from 'node:fs';
+import { existsSync, copyFileSync, constants, mkdirSync, writeFileSync } from 'node:fs';
 
 export function backupFile(path, stamp) {
   if (!existsSync(path)) return null;
@@ -38,4 +38,21 @@ export function mergeHooks(settings, newHooks) {
     out.hooks[event] = current;
   }
   return out;
+}
+
+export function scaffoldTree(root, tree) {
+  function walk(dir, node) {
+    mkdirSync(dir, { recursive: true });
+    for (const [key, val] of Object.entries(node)) {
+      const path = `${dir}/${key}`;
+      if (val === null || typeof val !== 'object' || val instanceof Date) {
+        if (!existsSync(path)) writeFileSync(path, val || '');
+      } else if (Object.keys(val).length === 0) {
+        mkdirSync(path, { recursive: true });
+      } else {
+        walk(path, val);
+      }
+    }
+  }
+  walk(root, tree);
 }
