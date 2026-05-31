@@ -15,3 +15,24 @@ export async function detectPkgManager(os, runner) {
   if (os === 'linux' && await probe('apt-get')) return 'apt';
   return null;
 }
+
+export function parsePluginList(stdout) {
+  const out = [];
+  const lines = stdout.split(/\r?\n/);
+  let cur = null;
+  for (const line of lines) {
+    const head = line.match(/❯\s+([^@\s]+)@(\S+)/);
+    if (head) { cur = { name: head[1], marketplace: head[2], enabled: false }; out.push(cur); continue; }
+    if (cur && /Status:/.test(line)) cur.enabled = /enabled/i.test(line) && !/disabled/i.test(line);
+  }
+  return out;
+}
+
+export function parseMcpList(stdout) {
+  const out = [];
+  for (const line of stdout.split(/\r?\n/)) {
+    const m = line.match(/^([\w:-]+):\s.*-\s*(✓ Connected|✗.*)$/);
+    if (m) out.push({ name: m[1], connected: m[2].startsWith('✓') });
+  }
+  return out;
+}
