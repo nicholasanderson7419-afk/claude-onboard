@@ -4,6 +4,7 @@ import { run } from '../src/lib/exec.js';
 import { buildContext } from '../src/context.js';
 import { runWizard } from '../src/wizard.js';
 import { ui, decide } from '../src/ui.js';
+import { clackIo } from '../src/io.js';
 
 import claudeCheck from '../src/steps/00-claude-check.js';
 import prereqs from '../src/steps/02-prereqs.js';
@@ -33,8 +34,13 @@ function today() {
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 }
 
-const ctx = await buildContext({ platform: process.platform, home: homedir(), stamp: stamp(), today: today(), run });
+const ctx = await buildContext({ platform: process.platform, home: homedir(), stamp: stamp(), today: today(), run, io: clackIo() });
 const steps = [claudeCheck, prereqs, plugins, claudemd, hooks, secondbrain, northstar, loops, summary];
-const out = await runWizard(steps, ctx, { decide, ui });
 
-if (!out.aborted) ui.note(renderSummary(out.results), 'Setup summary');
+try {
+  const out = await runWizard(steps, ctx, { decide, ui });
+  if (!out.aborted) ui.note(renderSummary(out.results), 'Setup summary');
+} catch (e) {
+  ui.log.error(`Something went wrong: ${e && e.message ? e.message : e}`);
+  process.exit(1);
+}
