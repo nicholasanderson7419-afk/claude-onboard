@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdtempSync, writeFileSync, readFileSync, existsSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { backupFile } from '../../src/lib/writers.js';
+import { backupFile, appendSection } from '../../src/lib/writers.js';
 
 let dir;
 beforeEach(() => { dir = mkdtempSync(join(tmpdir(), 'co-')); });
@@ -29,5 +29,29 @@ describe('backupFile', () => {
     writeFileSync(f, 'v2');
     const bak2 = backupFile(f, 'stamp1');
     expect(readFileSync(bak2, 'utf8')).toBe('v1');
+  });
+});
+
+describe('appendSection', () => {
+  it('appends a marked section when the marker is absent', () => {
+    const out = appendSection('# existing\n', 'onboard:global', 'RULE ONE');
+    expect(out).toContain('# existing');
+    expect(out).toContain('<!-- onboard:global:start -->');
+    expect(out).toContain('RULE ONE');
+    expect(out).toContain('<!-- onboard:global:end -->');
+  });
+
+  it('is idempotent — re-appending the same marker does not duplicate', () => {
+    const once = appendSection('base\n', 'onboard:global', 'RULE');
+    const twice = appendSection(once, 'onboard:global', 'RULE');
+    const count = (twice.match(/onboard:global:start/g) || []).length;
+    expect(count).toBe(1);
+  });
+
+  it('replaces the section body when content changed', () => {
+    const once = appendSection('base\n', 'onboard:global', 'OLD');
+    const twice = appendSection(once, 'onboard:global', 'NEW');
+    expect(twice).toContain('NEW');
+    expect(twice).not.toContain('OLD');
   });
 });
