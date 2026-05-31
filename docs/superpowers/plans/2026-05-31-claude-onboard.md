@@ -1589,20 +1589,12 @@ git commit -m "feat: step 5 hooks (merge SessionStart into settings.json, idempo
 
 **Files:**
 - Create: `src/steps/06-secondbrain.js`
-- Create: `src/templates/vault/North Star.md`
 - Create: `src/templates/vault/MEMORY.md`
 - Test: `tests/steps/06-secondbrain.test.js`
 
-- [ ] **Step 1: Create vault seed templates**
+(North Star.md is NOT seeded here — see Task 18b.)
 
-`src/templates/vault/North Star.md`:
-```markdown
-# North Star
-
-What I am working toward right now:
-
--
-```
+- [ ] **Step 1: Create the MEMORY.md seed template**
 
 `src/templates/vault/MEMORY.md`:
 ```markdown
@@ -1633,7 +1625,8 @@ describe('step 06 secondbrain', () => {
     const res = await step.apply(ctx);
     expect(res.ok).toBe(true);
     expect(existsSync(join(vault, 'wiki', 'concepts'))).toBe(true);
-    expect(existsSync(join(vault, 'North Star.md'))).toBe(true);
+    expect(existsSync(join(vault, 'brain'))).toBe(true);          // brain/ dir created, but NOT North Star.md (owned by Task 18b)
+    expect(existsSync(join(vault, 'North Star.md'))).toBe(false);
     expect(calls.some(c => c.includes('mcp add obsidian-vault -s user --') && c.includes(vault))).toBe(true);
   });
 
@@ -1689,9 +1682,10 @@ export default {
     const changes = [];
     scaffoldTree(vaultPath, {
       'brain/': null, 'wiki/concepts/': null, 'raw/': null,
-      'North Star.md': readFileSync(join(tplDir, 'North Star.md'), 'utf8'),
       'MEMORY.md': readFileSync(join(tplDir, 'MEMORY.md'), 'utf8')
     });
+    // NOTE: North Star.md is intentionally NOT seeded here — Task 18b (North Star
+    // interview) owns it. This step only creates the brain/ directory it lives in.
     changes.push(`vault scaffolded at ${vaultPath}`);
 
     const r = await addMcp(ctx.env.run, 'obsidian-vault', 'user',
@@ -1735,6 +1729,212 @@ Expected: PASS.
 git add src/steps/06-secondbrain.js src/templates/vault tests/steps/06-secondbrain.test.js
 git commit -m "feat: step 6 second brain (vault scaffold + -s user MCP + unsafe-path guard)"
 ```
+
+---
+
+## Task 18b: Step 6b — NORTH STAR (headline interview + om-standup-lite)
+
+The centerpiece step. Interviews the user, writes `brain/North Star.md` with proper
+frontmatter, and installs an `om-standup` lite command that reads it.
+
+**Files:**
+- Create: `src/steps/06b-northstar.js`
+- Create: `src/templates/north-star.md`
+- Create: `src/templates/om-standup.md`
+- Test: `tests/steps/06b-northstar.test.js`
+
+- [ ] **Step 1: Create the North Star template (`src/templates/north-star.md`)**
+
+```markdown
+---
+date: {{DATE}}
+description: "Living document of goals and focus — read at session start, updated when direction shifts"
+tags:
+  - brain
+  - north-star
+aliases:
+  - Goals
+  - Focus
+---
+
+# North Star
+
+## Current Focus
+
+{{FOCUS}}
+
+## Goals
+
+### Short-term (This Quarter)
+{{SHORT}}
+
+### Medium-term (This Half)
+{{MEDIUM}}
+
+### Long-term (This Year+)
+{{LONG}}
+```
+
+- [ ] **Step 2: Create the om-standup-lite command (`src/templates/om-standup.md`)**
+
+```markdown
+---
+description: Read my North Star and summarize current focus + open goals
+---
+
+Read the file `brain/North Star.md` in this vault. Then give me a short standup:
+1. My current focus (one line).
+2. The open goals under Short-term, Medium-term, Long-term.
+3. Ask which one I want to work on this session.
+
+Keep it tight. Do not invent goals that are not in the file.
+```
+
+- [ ] **Step 3: Write the failing test (`tests/steps/06b-northstar.test.js`)**
+
+```js
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { mkdtempSync, rmSync, readFileSync, existsSync, writeFileSync, mkdirSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import step from '../../src/steps/06b-northstar.js';
+
+let dir;
+beforeEach(() => { dir = mkdtempSync(join(tmpdir(), 'co-ns-')); });
+afterEach(() => { rmSync(dir, { recursive: true, force: true }); });
+
+describe('step 06b northstar', () => {
+  it('writes brain/North Star.md from interview answers with frontmatter and content', async () => {
+    const vault = join(dir, 'vault');
+    const proj = join(dir, 'proj');
+    const ctx = {
+      env: { stamp: 'S1', today: '2026-05-31' },
+      answers: {
+        vaultPath: vault, projectDir: proj,
+        nsFocus: 'Ship the wizard', nsShort: '- launch v1', nsMedium: '- 100 users', nsLong: '- sustainable income'
+      },
+      results: {}
+    };
+    const res = await step.apply(ctx);
+    expect(res.ok).toBe(true);
+    const ns = readFileSync(join(vault, 'brain', 'North Star.md'), 'utf8');
+    expect(ns).toContain('tags:');
+    expect(ns).toContain('north-star');
+    expect(ns).toContain('2026-05-31');
+    expect(ns).toContain('Ship the wizard');
+    expect(ns).toContain('- launch v1');
+  });
+
+  it('installs the om-standup command in the project .claude/commands dir', async () => {
+    const vault = join(dir, 'vault');
+    const proj = join(dir, 'proj');
+    const ctx = { env: { stamp: 'S1', today: '2026-05-31' }, answers: { vaultPath: vault, projectDir: proj, nsFocus: 'x', nsShort: '', nsMedium: '', nsLong: '' }, results: {} };
+    await step.apply(ctx);
+    expect(existsSync(join(proj, '.claude', 'commands', 'om-standup.md'))).toBe(true);
+  });
+
+  it('backs up an existing North Star.md instead of silently overwriting', async () => {
+    const vault = join(dir, 'vault');
+    mkdirSync(join(vault, 'brain'), { recursive: true });
+    writeFileSync(join(vault, 'brain', 'North Star.md'), 'EXISTING');
+    const ctx = { env: { stamp: 'S1', today: '2026-05-31' }, answers: { vaultPath: vault, projectDir: join(dir, 'p'), nsFocus: 'new', nsShort: '', nsMedium: '', nsLong: '' }, results: {} };
+    await step.apply(ctx);
+    expect(existsSync(join(vault, 'brain', 'North Star.md.bak.S1'))).toBe(true);
+    expect(readFileSync(join(vault, 'brain', 'North Star.md.bak.S1'), 'utf8')).toBe('EXISTING');
+  });
+
+  it('verify confirms North Star.md and the command file exist', async () => {
+    const vault = join(dir, 'vault');
+    const proj = join(dir, 'proj');
+    const ctx = { env: { stamp: 'S1', today: '2026-05-31' }, answers: { vaultPath: vault, projectDir: proj, nsFocus: 'x', nsShort: '', nsMedium: '', nsLong: '' }, results: {} };
+    await step.apply(ctx);
+    const v = await step.verify(ctx);
+    expect(v.checks.every(c => c.pass)).toBe(true);
+  });
+});
+```
+
+- [ ] **Step 4: Run test to verify it fails**
+
+Run: `npx vitest run tests/steps/06b-northstar.test.js`
+Expected: FAIL — module not found.
+
+- [ ] **Step 5: Write minimal implementation (`src/steps/06b-northstar.js`)**
+
+```js
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { backupFile } from '../lib/writers.js';
+import { check } from '../lib/verify.js';
+
+const tplDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'templates');
+const tpl = (name) => readFileSync(join(tplDir, name), 'utf8');
+
+function blank(v) { return (v && v.trim()) ? v : '-'; }
+
+export default {
+  id: 'northstar',
+  title: 'North Star',
+  async inspect() { return {}; },
+  explain() {
+    return 'Your North Star is a living goals file Claude reads at the start of every session, so it always knows what you are working toward. It is the single most useful piece of context you can give Claude — so we build it together now.';
+  },
+  async prompt() { return {}; }, // UI layer collects nsFocus/nsShort/nsMedium/nsLong
+  async apply(ctx) {
+    const a = ctx.answers;
+    const changes = [];
+
+    // 1. North Star.md
+    const brainDir = join(a.vaultPath, 'brain');
+    mkdirSync(brainDir, { recursive: true });
+    const nsPath = join(brainDir, 'North Star.md');
+    if (existsSync(nsPath)) backupFile(nsPath, ctx.env.stamp);
+    const ns = tpl('north-star.md')
+      .replace('{{DATE}}', ctx.env.today)
+      .replace('{{FOCUS}}', blank(a.nsFocus))
+      .replace('{{SHORT}}', blank(a.nsShort))
+      .replace('{{MEDIUM}}', blank(a.nsMedium))
+      .replace('{{LONG}}', blank(a.nsLong));
+    writeFileSync(nsPath, ns);
+    changes.push(`wrote ${nsPath}`);
+
+    // 2. om-standup-lite command in the project
+    const cmdDir = join(a.projectDir, '.claude', 'commands');
+    mkdirSync(cmdDir, { recursive: true });
+    const cmdPath = join(cmdDir, 'om-standup.md');
+    if (!existsSync(cmdPath)) { writeFileSync(cmdPath, tpl('om-standup.md')); changes.push(`installed /om-standup at ${cmdPath}`); }
+    else changes.push('/om-standup already present');
+
+    return { ok: true, changes };
+  },
+  async verify(ctx) {
+    const nsPath = join(ctx.answers.vaultPath, 'brain', 'North Star.md');
+    const cmdPath = join(ctx.answers.projectDir, '.claude', 'commands', 'om-standup.md');
+    return { checks: [
+      await check('North Star.md', async () => ({ pass: existsSync(nsPath), proof: nsPath })),
+      await check('/om-standup command', async () => ({ pass: existsSync(cmdPath), proof: cmdPath }))
+    ]};
+  }
+};
+```
+
+- [ ] **Step 6: Run test to verify it passes**
+
+Run: `npx vitest run tests/steps/06b-northstar.test.js`
+Expected: PASS (4 tests).
+
+- [ ] **Step 7: Commit**
+
+```bash
+git add src/steps/06b-northstar.js src/templates/north-star.md src/templates/om-standup.md tests/steps/06b-northstar.test.js
+git commit -m "feat: step 6b North Star (interview, frontmatter write, om-standup-lite command)"
+```
+
+**Note for Task 21 (context):** `buildContext` must also set `env.today` (an ISO
+date string `YYYY-MM-DD`). The CLI entry (Task 23) passes it in, computed once at
+startup (alongside `stamp`). Add `today` to the `buildContext` signature and to
+the Task 21 test's expectations.
 
 ---
 
@@ -1920,11 +2120,12 @@ import { buildContext } from '../src/context.js';
 describe('buildContext', () => {
   it('assembles env with os, pkgManager, home, stamp, run', async () => {
     const run = async (cmd, args) => ({ ok: cmd === 'which' && args[0] === 'apt-get', code: 0, stdout: '', stderr: '' });
-    const ctx = await buildContext({ platform: 'linux', home: '/home/x', stamp: 'S1', run });
+    const ctx = await buildContext({ platform: 'linux', home: '/home/x', stamp: 'S1', today: '2026-05-31', run });
     expect(ctx.env.os).toBe('linux');
     expect(ctx.env.pkgManager).toBe('apt');
     expect(ctx.env.home).toBe('/home/x');
     expect(ctx.env.stamp).toBe('S1');
+    expect(ctx.env.today).toBe('2026-05-31');
     expect(ctx.answers).toEqual({});
     expect(ctx.results).toEqual({});
   });
@@ -1941,10 +2142,10 @@ Expected: FAIL — module not found.
 ```js
 import { detectOS, detectPkgManager } from './lib/detect.js';
 
-export async function buildContext({ platform, home, stamp, run }) {
+export async function buildContext({ platform, home, stamp, today, run }) {
   const os = detectOS(platform);
   const pkgManager = await detectPkgManager(os, run);
-  return { env: { os, pkgManager, home, stamp, run }, answers: {}, results: {} };
+  return { env: { os, pkgManager, home, stamp, today, run }, answers: {}, results: {} };
 }
 ```
 
@@ -2115,6 +2316,7 @@ import plugins from '../src/steps/03-plugins.js';
 import claudemd from '../src/steps/04-claudemd.js';
 import hooks from '../src/steps/05-hooks.js';
 import secondbrain from '../src/steps/06-secondbrain.js';
+import northstar from '../src/steps/06b-northstar.js';
 import loops from '../src/steps/07-loops.js';
 import summary, { renderSummary } from '../src/steps/08-summary.js';
 
@@ -2130,9 +2332,14 @@ function stamp() {
   const pad = (n) => String(n).padStart(2, '0');
   return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
 }
+function today() {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
 
-const ctx = await buildContext({ platform: process.platform, home: homedir(), stamp: stamp(), run });
-const steps = [claudeCheck, prereqs, plugins, claudemd, hooks, secondbrain, loops, summary];
+const ctx = await buildContext({ platform: process.platform, home: homedir(), stamp: stamp(), today: today(), run });
+const steps = [claudeCheck, prereqs, plugins, claudemd, hooks, secondbrain, northstar, loops, summary];
 const out = await runWizard(steps, ctx, { decide, ui });
 
 if (!out.aborted) ui.note(renderSummary(out.results), 'Setup summary');

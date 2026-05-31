@@ -98,6 +98,7 @@ export default {
 4. CLAUDE.md                interview; writes rules MATCHING the plugins just chosen
 5. Hooks                    defined small set (see §6), correct per-OS syntax
 6. Second Brain bundle      filesystem-MCP@vaultpath + memory server + vault skeleton + rules
+6b. NORTH STAR (headline)   interview → write brain/North Star.md + install om-standup-lite
 7. Loops / automation       optional standing automations
 8. Summary report           green/red checklist with real proof per item
 ```
@@ -196,9 +197,33 @@ which would NOT make the second brain global:
    npx -y @modelcontextprotocol/server-memory` (knowledge-graph store, separate
    from the vault).
 3. **Vault skeleton:** scaffold `brain/`, `wiki/concepts/`, `raw/` + seed
-   `North Star.md`, `MEMORY.md`. Create-missing only; never touch existing notes.
+   `MEMORY.md`. Create-missing only; never touch existing notes. **North Star.md
+   is NOT seeded here** — it is owned by Step 6b (the interview), so this step
+   only creates the empty `brain/` directory it will live in.
 4. **CLAUDE.md wiki-pattern rules:** append Karpathy-pattern rules (wikilinks,
    raw→concepts, Claude maintains the wiki).
+
+### Step 6b — NORTH STAR (headline feature)
+The centerpiece. Most users (even experienced ones) don't have a clear North
+Star, so the wizard *builds one with them* rather than dropping an empty file.
+1. **Explain** plainly: a North Star is a living goals document Claude reads at
+   the start of every session to stay aligned with what you're actually working
+   toward. It is the single most valuable piece of context you can give Claude.
+2. **Interview** (all fields optional — a beginner can fill just "current focus"):
+   - Current focus (one line)
+   - Short-term goals (this quarter)
+   - Medium-term goals (this half)
+   - Long-term goals (this year+)
+3. **Write** `<vault>/brain/North Star.md` with proper frontmatter
+   (`date`, `description`, `tags: [brain, north-star]`, `aliases: [Goals, Focus]`)
+   matching the established vault schema. Backup-safe if it already exists.
+4. **Install om-standup-lite:** write a project slash command
+   `<projectDir>/.claude/commands/om-standup.md` that instructs Claude to read
+   `brain/North Star.md` and summarize current focus + open goals at session
+   start. This is the lite version of the user's own `/om-*` pack (a bespoke
+   project-local command system, not a marketplace plugin).
+5. **Verify:** North Star.md exists with the interview content; the om-standup
+   command file exists.
 
 ### Step 7 — Loops / automation (optional, re-scoped)
 **A shell wizard cannot create a `/loop`** — that's an in-session Claude command.
@@ -229,7 +254,9 @@ Outputs: real files + installed plugins/MCP.
 | plugins | `claude plugin install <name>@<mkt>` | verify via `claude plugin list` |
 | memory MCP (offered, default off) | `claude mcp add memory -s user -- npx -y @modelcontextprotocol/server-memory` | `-s user` = global; verify `mcp list` Connected |
 | vault MCP | `claude mcp add obsidian-vault -s user -- npx -y @modelcontextprotocol/server-filesystem <VAULT_PATH>` | `-s user`; wizard asks VAULT_PATH + warns broad-path security; verify Connected |
-| vault skeleton | scaffold folders + seed notes | create-missing only; never overwrite notes |
+| vault skeleton | scaffold `brain/`,`wiki/concepts/`,`raw/` + seed `MEMORY.md` | create-missing only; never overwrite notes (North Star.md excluded — see below) |
+| `<vault>/brain/North Star.md` | write from interview, with frontmatter | timestamped backup if exists; never silently overwrite |
+| `<projectDir>/.claude/commands/om-standup.md` | write om-standup-lite command | create-missing only |
 
 **Guarantees:**
 - Nothing destructive: every existing-file write uses timestamped backup +
