@@ -1238,7 +1238,13 @@ describe('step 02 prereqs', () => {
 
   it('apply adds gh when a gh-needing plugin is chosen', async () => {
     const calls = [];
-    const run = async (cmd, args) => { calls.push([cmd, ...args].join(' ')); return { ok: true, code: 0, stdout: 'x 1.0', stderr: '' }; };
+    // version probes report MISSING (ok:false) so apply proceeds to install;
+    // install commands succeed (ok:true). This is what tests the install path.
+    const run = async (cmd, args) => {
+      calls.push([cmd, ...args].join(' '));
+      if (args.includes('--version')) return { ok: false, code: 1, stdout: '', stderr: '' };
+      return { ok: true, code: 0, stdout: '', stderr: '' };
+    };
     const env = { os: 'linux', pkgManager: 'apt', run };
     const ctx = { env, answers: { plugins: [{ name: 'gh-cli', needs: ['gh'] }] }, results: {} };
     await step.apply(ctx);
