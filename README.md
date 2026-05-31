@@ -1,6 +1,6 @@
 # claude-onboard 🚀
 
-A friendly setup wizard that gets **Claude Code** fully configured for you — plugins, memory files, a notes "second brain," and your personal **North Star** goals — all by answering a few simple questions. No technical knowledge needed.
+A friendly setup wizard that gets **Claude Code** fully configured for you — plugins, memory files, a notes "second brain" with **semantic search**, and your personal **North Star** goals — all by answering a few simple questions. No technical knowledge needed.
 
 This guide assumes you're on a **Mac** and have never used the Terminal before. Just follow along in order.
 
@@ -191,10 +191,15 @@ This is the heart of it. The wizard interviews you:
 
 It writes all of this into a `North Star.md` file **and** installs an **`/om-standup`** command. From then on, you can type `/om-standup` in Claude and it reads your North Star and gives you a focused daily kickoff — so Claude always knows what you're actually working toward.
 
-### ⏰ Step 7 — Optional daily automation
+### 🔎 Step 7 — Search (QMD)
+Installs **QMD**, a private search engine over your notes, and points it at your home-base folder. It lets Claude **find the right note by meaning**, not just keywords — so as your second brain fills up, Claude can answer "where did I write about X?" instantly instead of reading every file. It pairs directly with your Second Brain (Step 5): the vault stores your notes, QMD searches them.
+- It indexes everything automatically and runs **entirely on your computer** (private — nothing uploaded).
+- **Heads up:** the first time you actually search a vault that has notes in it, QMD downloads its search "brain" (a few hundred MB, one time). At setup your vault is empty, so there's nothing to download yet — it just gets ready. The more notes you add, the more useful it gets.
+
+### ⏰ Step 8 — Optional daily automation
 If you want, it sets up a once-a-day scheduled Claude task. Totally optional — skip it if unsure.
 
-### ✅ Step 8 — Summary
+### ✅ Step 9 — Summary
 A clean ✓ / ✗ checklist showing exactly what got set up, with proof for each item.
 
 ---
@@ -217,4 +222,4 @@ Text Nick exactly what the Terminal says (a screenshot is perfect). The wizard i
 ---
 
 ### For the technically curious
-Built as a Node.js CLI, fully test-driven (63 automated tests + an end-to-end test). Run `npm test` to see them. The real `claude` CLI calls were validated read-only via `npm run smoke`. A couple of pre-1.0 notes: the `create-viral-content` plugin is disabled pending its source, and the `ffmpeg`-for-video dependency is auto-installed only if you pick the video plugin.
+Built as a Node.js CLI, fully test-driven (67 automated tests + an end-to-end test). Run `npm test` to see them. The real `claude` CLI calls were validated read-only via `npm run smoke`. A couple of pre-1.0 notes: the `create-viral-content` plugin is disabled pending its source, and the `ffmpeg`-for-video dependency is auto-installed only if you pick the video plugin.

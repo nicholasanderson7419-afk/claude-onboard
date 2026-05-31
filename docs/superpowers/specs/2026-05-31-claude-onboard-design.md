@@ -101,6 +101,7 @@ export default {
 5. Hooks                    defined small set (see §6), correct per-OS syntax
 6. Second Brain bundle      filesystem-MCP@vaultpath + memory server + vault skeleton + rules
 6b. NORTH STAR (headline)   interview → write brain/North Star.md + install om-standup-lite
+6c. QMD search              install @tobilu/qmd, index home-base folder, register qmd MCP (-s user)
 7. Loops / automation       optional standing automations
 8. Summary report           green/red checklist with real proof per item
 ```
@@ -319,7 +320,11 @@ Outputs: real files + installed plugins/MCP.
 
 ## 10. Planned — post-v0.1 (build AFTER buddy's first live run)
 
-### QMD semantic search step (decided: ALWAYS install, no prompt)
+### QMD semantic search step — ✅ BUILT (src/steps/06c-qmd.js, decided: ALWAYS install, no prompt)
+> Implemented 2026-06-01: indexes the home-base PROJECT folder (covers the vault
+> subfolder), registers `qmd mcp` at user scope, does NOT run `qmd embed` at setup
+> (no forced model download on an empty vault). Details below kept for reference.
+
 QMD = `@tobilu/qmd` (npm global). A local keyword + semantic ("vec") + hypothetical-doc
 ("hyde") search engine over the user's markdown vault, exposed to Claude as an MCP
 server. Closes the "semantic search" capability gap (the biggest score-mover for a
