@@ -31,3 +31,21 @@ describe('step 03 plugins', () => {
     expect(c.proof).toMatch(/installed/i);
   });
 });
+
+import { installBinary } from '../../src/lib/pkg.js';
+
+describe('step 03 plugins installs needs', () => {
+  it('installs gh when a chosen plugin needs it', async () => {
+    const calls = [];
+    const run = async (cmd, args) => {
+      calls.push([cmd, ...args].join(' '));
+      if (args[0] === 'plugin' && args[1] === 'list') return { ok: true, code: 0, stdout: '', stderr: '' };
+      if (args.includes('--version')) return { ok: false, code: 1, stdout: '', stderr: '' }; // gh missing
+      return { ok: true, code: 0, stdout: '', stderr: '' };
+    };
+    const ctx = { env: { os: 'linux', pkgManager: 'apt', run }, answers: { plugins: [{ name: 'gh-cli', marketplace: 'trailofbits', needs: ['gh'] }] }, results: {} };
+    const res = await step.apply(ctx);
+    expect(res.ok).toBe(true);
+    expect(calls.some(c => c.includes('apt-get') && c.includes('gh'))).toBe(true);
+  });
+});
