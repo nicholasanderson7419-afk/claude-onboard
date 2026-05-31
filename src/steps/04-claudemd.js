@@ -20,7 +20,14 @@ export default {
   explain() {
     return 'CLAUDE.md is the memory/rules file Claude reads every session. We write a global one (how you like to work) and a project one (what you are building).';
   },
-  async prompt() { return {}; }, // UI layer collects projectDir/name/desc/conventions
+  async prompt(ctx) {
+    const io = ctx.env.io; if (!io) return {};
+    const projectDir = (await io.text({ message: 'Path to your project folder?', placeholder: process.cwd() })) || process.cwd();
+    const projectName = (await io.text({ message: 'Project name?' })) || 'My Project';
+    const projectDesc = (await io.text({ message: 'One sentence — what is it?' })) || '';
+    const conventions = (await io.text({ message: 'Any conventions/rules to note? (optional)' })) || '';
+    return { projectDir, projectName, projectDesc, conventions };
+  },
   async apply(ctx) {
     const { home, stamp } = ctx.env;
     const a = ctx.answers;

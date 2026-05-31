@@ -16,13 +16,21 @@ export default {
   explain() {
     return 'Your North Star is a living goals file Claude reads at the start of every session, so it always knows what you are working toward. It is the single most useful piece of context you can give Claude — so we build it together now.';
   },
-  async prompt() { return {}; }, // UI layer collects nsFocus/nsShort/nsMedium/nsLong
+  async prompt(ctx) {
+    const io = ctx.env.io; if (!io) return {};
+    const nsFocus = (await io.text({ message: 'North Star — your current focus, one line?' })) || '';
+    const nsShort = (await io.text({ message: 'Short-term goals (this quarter)? Optional.' })) || '';
+    const nsMedium = (await io.text({ message: 'Medium-term goals (this half)? Optional.' })) || '';
+    const nsLong = (await io.text({ message: 'Long-term goals (this year+)? Optional.' })) || '';
+    return { nsFocus, nsShort, nsMedium, nsLong };
+  },
   async apply(ctx) {
     const a = ctx.answers;
     const changes = [];
 
     // 1. North Star.md
-    const brainDir = join(a.vaultPath, 'brain');
+    const base = a.vaultPath || a.projectDir;
+    const brainDir = join(base, 'brain');
     mkdirSync(brainDir, { recursive: true });
     const nsPath = join(brainDir, 'North Star.md');
     if (existsSync(nsPath)) backupFile(nsPath, ctx.env.stamp);
@@ -45,7 +53,8 @@ export default {
     return { ok: true, changes };
   },
   async verify(ctx) {
-    const nsPath = join(ctx.answers.vaultPath, 'brain', 'North Star.md');
+    const base = ctx.answers.vaultPath || ctx.answers.projectDir;
+    const nsPath = join(base, 'brain', 'North Star.md');
     const cmdPath = join(ctx.answers.projectDir, '.claude', 'commands', 'om-standup.md');
     return { checks: [
       await check('North Star.md', async () => ({ pass: existsSync(nsPath), proof: nsPath })),

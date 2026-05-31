@@ -22,8 +22,16 @@ export default {
   explain() {
     return 'This wires an Obsidian-style notes vault to Claude so it remembers across sessions. Claude gets read/write access to the vault folder only — pick a dedicated folder, not your whole drive.';
   },
-  async prompt() { return {}; },
+  async prompt(ctx) {
+    const io = ctx.env.io; if (!io) return {};
+    const wantVault = await io.confirm({ message: 'Set up an Obsidian-style second brain vault? (recommended)' });
+    if (!wantVault) return { skipVault: true, enableMemory: false };
+    const vaultPath = await io.text({ message: 'Dedicated folder for the vault (NOT your home or Desktop root)' });
+    const enableMemory = await io.confirm({ message: 'Also add the knowledge-graph memory server? (optional)' });
+    return { vaultPath, enableMemory };
+  },
   async apply(ctx) {
+    if (ctx.answers.skipVault || !ctx.answers.vaultPath) return { ok: true, changes: ['second brain skipped'] };
     const { vaultPath, enableMemory } = ctx.answers;
     if (isUnsafeVault(vaultPath, ctx.env.home)) {
       return { ok: false, changes: [], error: 'Please choose a dedicated vault folder, not your home or Desktop root (Claude would get write access to everything under it).' };
@@ -51,6 +59,7 @@ export default {
     return { ok: true, changes };
   },
   async verify(ctx) {
+    if (ctx.answers.skipVault || !ctx.answers.vaultPath) return { checks: [{ name: 'second brain', pass: true, proof: 'skipped by user' }] };
     const r = await mcpList(ctx.env.run);
     const servers = r.ok ? parseMcpList(r.stdout) : [];
     const find = (n) => servers.find(s => s.name === n);
