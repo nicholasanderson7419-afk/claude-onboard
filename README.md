@@ -8,28 +8,46 @@ This guide assumes you're on a **Mac** and have never used the Terminal before. 
 
 ## Part 1 — Get Claude Code first (one-time, before the wizard)
 
-The wizard sets up Claude Code, so you need Claude Code installed and signed in first.
+The wizard sets up **Claude Code**. So you need Claude Code installed and signed in first.
 
-### 1. Open the Terminal app
-- Press **⌘ Command + Space** (this opens Spotlight search).
-- Type **Terminal** and press **Return**.
-- A white or black window with text appears. That's the Terminal. You type commands here and press **Return** to run them.
+> **You need a paid plan.** Claude Code requires a **Pro, Max, Team, or Enterprise** subscription. The free Claude plan does **not** include it. (https://claude.com/pricing)
 
-### 2. Install Claude Code
-- Go to **https://claude.com/claude-code** in your browser and follow their install instructions for Mac, **or** paste this into Terminal and press Return:
-  ```
-  npm install -g @anthropic-ai/claude-code
-  ```
-  - If it says "command not found: npm", you first need Node.js — download it from **https://nodejs.org** (pick the "LTS" button), install it, then close and reopen Terminal and try the line above again.
+There are two pieces, and for this wizard you want **both**:
+- **The Desktop app** — the nice point-and-click version of Claude Code you'll actually use day to day.
+- **The Terminal CLI** — a command-line version. **The wizard runs through this**, so you need it even though you'll mostly use the app.
 
-### 3. Sign in to Claude Code
-- In Terminal, type:
-  ```
-  claude
-  ```
-- It will open a sign-in flow in your browser. Log in with your Claude account. Once it says you're connected, you can close it (press **Control + C**).
+Good news: they **share the same settings**. Everything this wizard sets up through the CLI automatically shows up in the Desktop app too. Set it up once, get it everywhere.
 
-✅ **You now have Claude Code installed and signed in.** On to the wizard.
+### Step A — Install the Desktop app (the GUI you'll use)
+1. Download it for Mac: **https://claude.ai/download**
+2. Open the downloaded file and drag **Claude** into your Applications folder.
+3. Launch **Claude** from Applications and **sign in** with your account.
+4. Click the **Code** tab at the top. If it asks you to upgrade, you're on the free plan — you'll need a paid one (see above).
+
+✅ You can now use Claude Code with a nice interface.
+
+### Step B — Install the Terminal CLI (so the wizard can run)
+1. Open the **Terminal** app:
+   - Press **⌘ Command + Space** (opens Spotlight search).
+   - Type **Terminal**, press **Return**. A window with text appears — this is where you paste commands and press **Return** to run them.
+2. Copy-paste this exact line and press **Return**:
+   ```
+   curl -fsSL https://claude.ai/install.sh | bash
+   ```
+   Wait for it to finish.
+3. **Close the Terminal window and open a new one** (the new command only works in a fresh window).
+4. Type this and press **Return** to sign in:
+   ```
+   claude
+   ```
+   It opens a browser sign-in. Log in. Once connected, you can leave it — or press **Control + C** to exit back to the terminal.
+5. Confirm it's working — type:
+   ```
+   claude --version
+   ```
+   If you see a version number, you're set. If you see "command not found", close and reopen Terminal and try again.
+
+✅ **You now have Claude Code in both the app and the terminal, signed in and sharing the same settings.** On to the wizard.
 
 ---
 
