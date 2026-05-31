@@ -314,3 +314,36 @@ Outputs: real files + installed plugins/MCP.
 - Resume-state file.
 - Publishing to public npm / freemium product polish.
 - Telemetry.
+
+---
+
+## 10. Planned — post-v0.1 (build AFTER buddy's first live run)
+
+### QMD semantic search step (decided: ALWAYS install, no prompt)
+QMD = `@tobilu/qmd` (npm global). A local keyword + semantic ("vec") + hypothetical-doc
+("hyde") search engine over the user's markdown vault, exposed to Claude as an MCP
+server. Closes the "semantic search" capability gap (the biggest score-mover for a
+new user). Grounded setup (verified on a live install, v2.5.2):
+1. **Install:** `npm install -g @tobilu/qmd`
+2. **Index the vault:** create a collection pointed at the vault folder (pattern
+   `**/*.md`) → writes `<vault>/.qmd/index.sqlite`. (Exact `qmd collection add` /
+   `qmd init` flag syntax to confirm at build time — per-subcommand `--help` did not
+   print; model on live config: a single collection at the folder root, `**/*.md`.)
+3. **Register MCP:** `claude mcp add qmd -s user -- qmd mcp` (matches live config).
+
+**Known caveat (must be surfaced to the user):** first index downloads local AI models
+— an embedding model (`embeddinggemma-300M`, GGUF) and a reranker
+(`Qwen3-Reranker-0.6B`, GGUF) from HuggingFace — a few hundred MB + disk, and it runs
+them locally. The vault starts empty, so QMD's value is **deferred** until the user has
+notes. Decision (Nick, 2026-05-31): install it unconditionally despite this, but the
+step must clearly tell the user about the one-time download.
+
+**Why deferred to post-v0.1:** ship the proven core to the buddy first; add QMD in the
+productization pass once the core install path is validated on a real machine.
+
+### Other productization items (if it goes from gift → product)
+- Real delivery: published `npx claude-onboard` / packaged installer (not a zip + manual `npm install`).
+- Pin plugin/marketplace versions + vetted list (third-party-code liability).
+- Resolve `aaaronmiller` source; confirm ffmpeg dependency.
+- Progress spinner around slow `claude mcp list` verify (~20s; looks frozen).
+- License, versioning, support path, update mechanism.
