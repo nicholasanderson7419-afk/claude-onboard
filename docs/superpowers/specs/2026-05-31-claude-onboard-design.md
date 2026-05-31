@@ -93,7 +93,9 @@ export default {
 ```
 0. Claude Code check        installed on PATH? authenticated? guide install/login if not
 1. Environment scan         OS, Node, versions, installed plugins/MCP, pkg-mgr present?
-2. Prerequisites            git, gh (essential); ffmpeg/Python/WSL/Docker only on demand
+2. Prerequisites            git only (essential). gh/ffmpeg installed by the PLUGINS step
+                            when a chosen plugin needs them (decoupled — prereqs runs before
+                            plugin selection, so it cannot know needs). Python/WSL/Docker on demand.
 3. Plugins / MCP            add 6 marketplaces, install core 6 + offer other 8, verify
 4. CLAUDE.md                interview; writes rules MATCHING the plugins just chosen
 5. Hooks                    defined small set (see §6), correct per-OS syntax
