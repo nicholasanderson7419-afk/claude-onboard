@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdtempSync, writeFileSync, readFileSync, existsSync, rmSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, readFileSync, existsSync, rmSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { backupFile, appendSection, mergeHooks, scaffoldTree } from '../../src/lib/writers.js';
@@ -85,26 +85,22 @@ describe('mergeHooks', () => {
 });
 
 describe('scaffoldTree', () => {
-  it('creates missing directories', () => {
-    const tree = { a: { b: { c: {} } } };
-    const root = join(dir, 'nested', 'tree');
-    scaffoldTree(root, tree);
-    expect(existsSync(join(root, 'a', 'b', 'c'))).toBe(true);
+  it('creates missing dirs and seed files, reports what it created', () => {
+    const created = scaffoldTree(dir, {
+      'brain/': null,
+      'wiki/concepts/': null,
+      'North Star.md': 'goals here'
+    });
+    expect(existsSync(join(dir, 'brain'))).toBe(true);
+    expect(existsSync(join(dir, 'wiki/concepts'))).toBe(true);
+    expect(readFileSync(join(dir, 'North Star.md'), 'utf8')).toBe('goals here');
+    expect(created).toContain('North Star.md');
   });
 
-  it('creates seed files without overwriting', () => {
-    const tree = { '.claude': { 'README.md': 'welcome' } };
-    const root = join(dir, 'project');
-    scaffoldTree(root, tree);
-    expect(existsSync(join(root, '.claude', 'README.md'))).toBe(true);
-    expect(readFileSync(join(root, '.claude', 'README.md'), 'utf8')).toBe('welcome');
-  });
-
-  it('does not overwrite existing files', () => {
-    const target = join(dir, 'config');
-    writeFileSync(target, 'existing');
-    const tree = { 'config': 'new' };
-    scaffoldTree(dir, tree);
-    expect(readFileSync(target, 'utf8')).toBe('existing');
+  it('never overwrites an existing note', () => {
+    writeFileSync(join(dir, 'North Star.md'), 'USER CONTENT');
+    const created = scaffoldTree(dir, { 'North Star.md': 'seed' });
+    expect(readFileSync(join(dir, 'North Star.md'), 'utf8')).toBe('USER CONTENT');
+    expect(created).not.toContain('North Star.md');
   });
 });
