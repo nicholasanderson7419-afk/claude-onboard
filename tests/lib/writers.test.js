@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdtempSync, writeFileSync, readFileSync, existsSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { backupFile, appendSection } from '../../src/lib/writers.js';
+import { backupFile, appendSection, mergeHooks } from '../../src/lib/writers.js';
 
 let dir;
 beforeEach(() => { dir = mkdtempSync(join(tmpdir(), 'co-')); });
@@ -53,5 +53,33 @@ describe('appendSection', () => {
     const twice = appendSection(once, 'onboard:global', 'NEW');
     expect(twice).toContain('NEW');
     expect(twice).not.toContain('OLD');
+  });
+});
+
+describe('mergeHooks', () => {
+  const existing = {
+    hooks: { SessionStart: [{ hooks: [{ type: 'command', command: 'echo a' }] }] }
+  };
+
+  it('adds a new event without touching existing ones', () => {
+    const out = mergeHooks(existing, { UserPromptSubmit: [{ hooks: [{ type: 'command', command: 'echo b' }] }] });
+    expect(out.hooks.SessionStart).toHaveLength(1);
+    expect(out.hooks.UserPromptSubmit).toHaveLength(1);
+  });
+
+  it('does not duplicate an identical command on the same event', () => {
+    const out = mergeHooks(existing, { SessionStart: [{ hooks: [{ type: 'command', command: 'echo a' }] }] });
+    expect(out.hooks.SessionStart).toHaveLength(1);
+  });
+
+  it('appends a different command on an existing event', () => {
+    const out = mergeHooks(existing, { SessionStart: [{ hooks: [{ type: 'command', command: 'echo NEW' }] }] });
+    expect(out.hooks.SessionStart).toHaveLength(2);
+  });
+
+  it('preserves unrelated top-level keys', () => {
+    const withModel = { model: 'opus', ...existing };
+    const out = mergeHooks(withModel, {});
+    expect(out.model).toBe('opus');
   });
 });

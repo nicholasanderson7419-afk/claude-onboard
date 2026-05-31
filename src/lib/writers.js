@@ -19,3 +19,23 @@ export function appendSection(content, marker, body) {
 }
 
 function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+export function mergeHooks(settings, newHooks) {
+  const out = { ...settings, hooks: { ...(settings.hooks || {}) } };
+  for (const [event, entries] of Object.entries(newHooks)) {
+    const current = out.hooks[event] ? [...out.hooks[event]] : [];
+    const existingCmds = new Set(
+      current.flatMap(e => (e.hooks || []).map(h => h.command))
+    );
+    for (const entry of entries) {
+      const cmds = (entry.hooks || []).map(h => h.command);
+      const allPresent = cmds.length > 0 && cmds.every(c => existingCmds.has(c));
+      if (!allPresent) {
+        current.push(entry);
+        cmds.forEach(c => existingCmds.add(c));
+      }
+    }
+    out.hooks[event] = current;
+  }
+  return out;
+}
