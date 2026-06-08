@@ -2,7 +2,9 @@
 
 A friendly setup wizard that gets **Claude Code** fully configured for you — plugins, memory files, a notes "second brain" with **semantic search**, and your personal **North Star** goals — all by answering a few simple questions. No technical knowledge needed.
 
-This guide assumes you're on a **Mac** and have never used the Terminal before. Just follow along in order.
+The main guide (Parts 1–3) assumes you're on a **Mac** and have never used the Terminal before. Just follow along in order.
+
+> **On Windows?** Jump to **[Windows (PowerShell) — full install](#windows-powershell--full-install)** below. It has the complete, copy-paste version of every step, including the prerequisites (`git` and Node.js) that a fresh Windows PC doesn't come with.
 
 ---
 
@@ -117,6 +119,91 @@ Claude reads your North Star goals and gives you a focused daily kickoff, then a
 - Keep your work inside **`Desktop/Projects`** so Claude always has your context.
 - Just talk to it in plain English in the **Code** tab — "build me a webpage that…", "fix this", "explain this file."
 - Re-running the wizard later is safe; it won't duplicate anything.
+
+---
+
+## Windows (PowerShell) — full install
+
+The Mac guide above uses tools that come pre-installed on a developer's Mac. A **fresh Windows PC does not have them**, so on Windows you install two building blocks first (`git` and Node.js), then everything else is the same. Every command here goes into **PowerShell**.
+
+> **Open PowerShell:** press **Start**, type **PowerShell**, press **Enter**. A blue window appears — that's where you paste commands and press **Enter** to run them.
+
+### Step 1 — Install the prerequisites (git + Node.js)
+
+A fresh Windows machine doesn't have `git` (needed to download the project) or `Node.js` (needed to run it). Install both at once. Paste this whole line and press **Enter**:
+
+```powershell
+winget install --id Git.Git -e; winget install --id OpenJS.NodeJS.LTS -e
+```
+
+- If a box pops up asking for permission, click **Yes**.
+- `winget` is built into Windows 10 and 11. If you get **"winget is not recognized"**, install the two tools by hand instead:
+  - **Git:** download from **https://git-scm.com/download/win**, run the installer, click **Next** through the defaults.
+  - **Node.js:** download the **LTS** version from **https://nodejs.org**, run the installer, accept the defaults.
+
+> **Important:** after installing, **fully close PowerShell and open a brand-new window.** New commands only become available in a fresh window.
+
+### Step 2 — Verify the prerequisites
+
+In the **new** PowerShell window, paste this and press **Enter**:
+
+```powershell
+git --version; node --version; npm --version
+```
+
+You should see **three version numbers** (for example `git version 2.x`, `v20.x`, `10.x`). If any line says **"not recognized"**, that tool didn't install — re-do Step 1 for it, then open a fresh window and check again.
+
+### Step 3 — Install Claude Code (and sign in)
+
+The wizard configures **Claude Code**, so you need it installed and signed in first. In PowerShell:
+
+```powershell
+irm https://claude.ai/install.ps1 | iex
+```
+
+> This is the Windows equivalent of the Mac `curl -fsSL https://claude.ai/install.sh | bash` line. **Do not** paste the `bash` version into PowerShell — Windows has no `bash` and it will fail.
+
+Then **close PowerShell, open a new window**, and sign in:
+
+```powershell
+claude
+```
+
+It opens a browser to log in. Once connected you can press **Ctrl + C** to return to PowerShell. Confirm it's installed:
+
+```powershell
+claude --version
+```
+
+> **You need a paid plan.** Claude Code requires **Pro, Max, Team, or Enterprise** — the free plan does not include it. (https://claude.com/pricing)
+
+### Step 4 — Download and run the wizard
+
+Paste these lines one at a time (press **Enter** after each):
+
+```powershell
+git clone https://github.com/nicholasanderson7419-afk/claude-onboard.git
+cd claude-onboard
+npm install
+node bin/cli.js
+```
+
+- `git clone …` downloads the project into a `claude-onboard` folder.
+- `cd claude-onboard` moves into that folder.
+- `npm install` downloads what the wizard needs (takes a minute or so).
+- `node bin/cli.js` starts the wizard.
+
+From here, **answer the questions** exactly as described in [Part 2 → "Answer the questions"](#4-answer-the-questions) above (arrow keys to move, **Space** to tick checkboxes, **Enter** to confirm). When it asks for folders, point it at a home-base folder you've made, e.g. `C:\Users\<you>\Desktop\Projects` and a `vault` inside it.
+
+### Windows troubleshooting
+
+- **`git` / `node` / `npm` "is not recognized"** → the tool isn't installed, or you're in an old window. Re-run Step 1 for that tool, then **open a fresh PowerShell window**.
+- **`bash : The term 'bash' is not recognized`** → you pasted the Mac install line. Use the PowerShell line in Step 3 instead (`irm https://claude.ai/install.ps1 | iex`).
+- **`winget` "is not recognized"** → use the manual download links in Step 1.
+- **`claude` "is not recognized"** after install → close PowerShell, open a new window, try again. If still missing, re-run the Step 3 install line.
+- **Execution-policy error running a script** → run PowerShell **as Administrator** and enter `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`, press **Y**, then retry.
+
+Once the wizard finishes, continue with **[Part 3 — Start actually using Claude](#part-3--start-actually-using-claude)** (the steps are the same on Windows — just open your home-base folder in the Claude app's **Code** tab).
 
 ---
 
