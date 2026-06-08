@@ -23,7 +23,11 @@ export default {
     return 'This wires an Obsidian-style notes vault to Claude so it remembers across sessions. Claude gets read/write access to the vault folder only — pick a dedicated folder, not your whole drive.';
   },
   async prompt(ctx) {
-    const io = ctx.env.io; if (!io) return {};
+    const io = ctx.env.io;
+    if (ctx.env.express) {
+      return { vaultPath: join(ctx.env.home, 'Desktop', 'Projects', 'vault'), enableMemory: true };
+    }
+    if (!io) return {};
     const wantVault = await io.confirm({ message: 'Set up an Obsidian-style second brain vault? (recommended)' });
     if (!wantVault) return { skipVault: true, enableMemory: false };
     const vaultPath = await io.text({ message: 'Dedicated folder for the vault (NOT your home or Desktop root)' });

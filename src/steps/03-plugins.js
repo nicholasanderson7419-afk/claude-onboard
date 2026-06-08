@@ -17,6 +17,10 @@ export default {
   // prompt() is provided by the wizard UI layer; defaults to CORE.
   async prompt(ctx) {
     const io = ctx.env.io;
+    if (ctx.env.express) {
+      const want = new Set(['elements-of-style', 'private-journal-mcp', 'obsidian']);
+      return { plugins: [...CORE, ...OPTIONAL.filter(p => p.available && want.has(p.name))] };
+    }
     if (!io) return { plugins: CORE };
     const options = [
       ...CORE.map(p => ({ value: p.name, label: p.name, hint: 'core' })),

@@ -37,11 +37,12 @@ function today() {
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 }
 
-const ctx = await buildContext({ platform: process.platform, home: homedir(), stamp: stamp(), today: today(), run, io: clackIo() });
+const express = process.argv.includes('--express');
+const ctx = await buildContext({ platform: process.platform, home: homedir(), stamp: stamp(), today: today(), run, io: express ? null : clackIo(), express });
 const steps = [claudeCheck, prereqs, plugins, claudemd, hooks, secondbrain, northstar, qmd, mcpServers, skills, loops, summary];
 
 try {
-  const out = await runWizard(steps, ctx, { decide, ui });
+  const out = await runWizard(steps, ctx, { decide: express ? async () => 'skip' : decide, ui });
   if (!out.aborted) ui.note(renderSummary(out.results), 'Setup summary');
 } catch (e) {
   ui.log.error(`Something went wrong: ${e && e.message ? e.message : e}`);

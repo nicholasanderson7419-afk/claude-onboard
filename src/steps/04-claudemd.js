@@ -21,7 +21,11 @@ export default {
     return 'CLAUDE.md is the memory/rules file Claude reads every session. We write a global one (how you like to work) and a project one (what you are building).';
   },
   async prompt(ctx) {
-    const io = ctx.env.io; if (!io) return {};
+    const io = ctx.env.io;
+    if (ctx.env.express) {
+      return { projectDir: join(ctx.env.home, 'Desktop', 'Projects'), projectName: 'My Project', projectDesc: 'Configured with claude-onboard.', conventions: '' };
+    }
+    if (!io) return {};
     const projectDir = (await io.text({ message: 'Path to your project folder?', placeholder: process.cwd() })) || process.cwd();
     const projectName = (await io.text({ message: 'Project name?' })) || 'My Project';
     const projectDesc = (await io.text({ message: 'One sentence — what is it?' })) || '';
