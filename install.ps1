@@ -6,7 +6,9 @@ $ErrorActionPreference = 'Stop'
 function Section($t) { Write-Host "`n>>> $t" -ForegroundColor Cyan }
 function Have($c) { [bool](Get-Command $c -ErrorAction SilentlyContinue) }
 function Refresh-Path {
-  $env:Path = [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' + [Environment]::GetEnvironmentVariable('Path', 'User')
+  # winget-installed Claude CLI lives in ~\.local\bin; node/git land on Machine PATH; winget shims in Links.
+  $extra = "$HOME\.local\bin;$env:LOCALAPPDATA\Microsoft\WinGet\Links"
+  $env:Path = $extra + ';' + [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' + [Environment]::GetEnvironmentVariable('Path', 'User')
 }
 
 Write-Host "`n=== claude-onboard: all-in-one Claude setup ===" -ForegroundColor Green
@@ -31,6 +33,10 @@ foreach ($p in $pkgs) {
 Refresh-Path
 
 Section "Signing in to Claude"
+if (-not (Have claude)) {
+  Write-Host "  Claude isn't on PATH in this window yet. Close PowerShell, open a NEW window, and paste the install line again." -ForegroundColor Yellow
+  return
+}
 function Test-ClaudeAuth { try { return ((claude auth status 2>$null | Out-String) -match '"loggedIn"\s*:\s*true') } catch { return $false } }
 if (-not (Test-ClaudeAuth)) {
   Write-Host "  A sign-in will open - log into your Anthropic account, then come back here." -ForegroundColor Yellow
