@@ -2,7 +2,7 @@
 
 A friendly setup wizard that gets **Claude Code** fully configured for you — plugins, memory files, a notes "second brain" with **semantic search**, and your personal **North Star** goals — all by answering a few simple questions. No technical knowledge needed.
 
-This guide assumes you're on a **Mac** and have never used the Terminal before. Just follow along in order.
+**Mac only.** This guide assumes you're on a **Mac** and have never used the Terminal. Windows and Linux are **not** covered. Just follow along in order.
 
 ---
 
@@ -35,7 +35,7 @@ Good news: they **share the same settings**. Everything this wizard sets up thro
    ```
    curl -fsSL https://claude.ai/install.sh | bash
    ```
-   Wait for it to finish.
+   Wait for it to finish. **If a box pops up asking to install *command line developer tools*, click Install, let it finish, then paste the line again.**
 3. **Close the Terminal window and open a new one** (the new command only works in a fresh window).
 4. Type this and press **Return** to sign in:
    ```
@@ -48,7 +48,17 @@ Good news: they **share the same settings**. Everything this wizard sets up thro
    ```
    If you see a version number, you're set. If you see "command not found", close and reopen Terminal and try again.
 
-✅ **You now have Claude Code in both the app and the terminal, signed in and sharing the same settings.** On to the wizard.
+### Step C — Install Node.js (the wizard runs on it)
+The wizard is a small **Node.js** program, so you need Node installed. It does **not** come with Claude Code — you install it yourself, once:
+1. Go to **https://nodejs.org** and click the big **LTS** button (downloads the macOS Installer, a `.pkg` file).
+2. Open the downloaded `.pkg` and click through **Continue → Agree → Install** (enter your Mac password if asked).
+3. Check it worked — in Terminal type:
+   ```
+   node --version
+   ```
+   A number like `v20.x` (anything 18 or higher) means you're set. If it says *command not found*, close Terminal, open a new window, and try again.
+
+✅ **You now have Claude Code (app + terminal) and Node.js — signed in and ready.** On to the wizard.
 
 ---
 
@@ -71,14 +81,27 @@ When the wizard later asks for your **project folder**, give it `Desktop/Project
 
 **How to type a folder path when asked:** the easiest way — type nothing, just **drag the folder from Finder into the Terminal** and it fills in the path for you. Or type it by hand like `~/Desktop/Projects` (the `~` means "my home folder").
 
-### 1. Unzip the folder
-- Double-click `claude-onboard.zip` (it's probably in your Downloads). A folder called `claude-onboard` appears.
+### 1. Get the project with git (no zip)
+You'll pull the project straight onto your Mac — nothing to download or unzip.
 
-### 2. Open Terminal in that folder (easy drag trick)
-- Open Terminal again (⌘ Space → "Terminal").
-- Type `cd ` — that's **c**, **d**, then a **space**. Don't press Return yet.
-- **Drag the `claude-onboard` folder** from Finder right into the Terminal window and let go. It pastes the folder's location automatically.
-- Now press **Return**.
+1. **First time only — sign in to GitHub from the Terminal.** Easiest is the GitHub CLI:
+   ```
+   brew install gh
+   gh auth login
+   ```
+   Choose **GitHub.com → HTTPS → Login with a web browser** and follow the prompts. (No Homebrew? Get `gh` from https://cli.github.com — or ask Nick.)
+
+2. **Clone it into your home base:**
+   ```
+   cd ~/Desktop/Projects
+   gh repo clone nicholasanderson7419-afk/claude-onboard
+   ```
+   A `claude-onboard` folder appears inside `Desktop/Projects`.
+
+### 2. Go into the folder
+```
+cd claude-onboard
+```
 
 ### 3. Run these two lines (one at a time, press Return after each)
 ```
@@ -103,7 +126,7 @@ Newly installed plugins activate on a fresh start. **Fully quit the Claude app**
 
 ### 2. Open your home-base folder in the app
 1. Open the **Claude** app → click the **Code** tab.
-2. Click **Select folder** and choose **`Desktop/Projects`** (your home base).
+2. Click **New Project** → **Use an existing folder** → pick **`Desktop/Projects`**. (On older versions this button says **Select folder**.)
 3. That's it — Claude now sees your instructions (CLAUDE.md), your notes vault, and your plugins automatically.
 
 ### 3. Kick off with your North Star
@@ -123,6 +146,7 @@ Claude reads your North Star goals and gives you a focused daily kickoff, then a
 ## Troubleshooting (if a step errors)
 
 - **"command not found: claude"** → close Terminal, open a new window, try again. If still missing, re-run the install line from Part 1 Step B.
+- **"command not found: npm" or "node"** → Node.js isn't installed. Do **Part 1 Step C** (install from nodejs.org), then close Terminal, open a new window, and try again.
 - **macOS blocks the app or installer** ("unidentified developer" / "cannot be opened") → right-click the app → **Open** → **Open** again. Or **System Settings → Privacy & Security** → scroll down → **Open Anyway**.
 - **A wizard step fails** → pick **Skip** to keep going, or **Retry**. Then screenshot what it said and send it to Nick. Nothing is broken — the wizard backs up files and never deletes your notes.
 - **It asks for a paid plan** → Claude Code needs Pro/Max/Team/Enterprise; the free plan won't work.
@@ -226,9 +250,9 @@ Yes:
 - If a step fails, you get **Retry / Skip / Stop**, never a crash that breaks things.
 
 ## Requirements recap
-- A **Mac** (these instructions) — it also works on Windows/Linux.
+- A **Mac** — these instructions are **Mac only** (Windows/Linux not covered).
 - **Claude Code** installed and signed in (Part 1).
-- **Node.js 18+** (comes with Claude Code).
+- **Node.js 18+** — you install this yourself (Part 1, Step C). It does **not** come bundled with Claude Code.
 
 ## If you get stuck
 Text Nick exactly what the Terminal says (a screenshot is perfect). The wizard is designed to fail safely, so you can't really break anything.
