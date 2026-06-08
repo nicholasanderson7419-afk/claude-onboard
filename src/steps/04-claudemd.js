@@ -23,7 +23,8 @@ export default {
   async prompt(ctx) {
     const io = ctx.env.io;
     if (ctx.env.express) {
-      return { projectDir: join(ctx.env.home, 'Desktop', 'Projects'), projectName: 'My Project', projectDesc: 'Configured with claude-onboard.', conventions: '' };
+      const root = ctx.env.projectRoot || join(ctx.env.home, 'Desktop', 'Projects');
+      return { projectDir: root, projectName: 'My Project', projectDesc: 'Configured with claude-onboard.', conventions: '' };
     }
     if (!io) return {};
     const projectDir = (await io.text({ message: 'Path to your project folder?', placeholder: process.cwd() })) || process.cwd();

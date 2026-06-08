@@ -49,7 +49,8 @@ if (-not (Test-ClaudeAuth)) {
 Write-Host "  signed in."
 
 Section "Getting the setup"
-$base = Join-Path $HOME 'Desktop\Projects'
+$desktop = [Environment]::GetFolderPath('Desktop')   # OneDrive-aware real Desktop
+$base = Join-Path $desktop 'Projects'
 $dest = Join-Path $base 'claude-onboard'
 New-Item -ItemType Directory -Force -Path $base | Out-Null
 if (Test-Path (Join-Path $dest '.git')) { git -C $dest pull --quiet }
@@ -58,6 +59,6 @@ Set-Location $dest
 
 Section "Configuring everything (no questions - using recommended defaults)"
 npm install --silent
-node bin/cli.js --express
+node bin/cli.js --express --project "$base"
 
-Write-Host "`n[OK] All set!  Open the Claude app -> Code tab -> open Desktop\Projects -> type /om-standup`n" -ForegroundColor Green
+Write-Host "`n[OK] All set!  Open the Claude app -> Code tab -> open '$base' -> type /om-standup`n" -ForegroundColor Green

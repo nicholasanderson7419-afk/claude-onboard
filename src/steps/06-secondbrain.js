@@ -25,7 +25,8 @@ export default {
   async prompt(ctx) {
     const io = ctx.env.io;
     if (ctx.env.express) {
-      return { vaultPath: join(ctx.env.home, 'Desktop', 'Projects', 'vault'), enableMemory: true };
+      const root = ctx.env.projectRoot || join(ctx.env.home, 'Desktop', 'Projects');
+      return { vaultPath: join(root, 'vault'), enableMemory: true };
     }
     if (!io) return {};
     const wantVault = await io.confirm({ message: 'Set up an Obsidian-style second brain vault? (recommended)' });

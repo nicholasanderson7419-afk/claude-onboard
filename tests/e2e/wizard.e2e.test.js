@@ -66,4 +66,15 @@ describe('end-to-end wizard run (fake io, fake run, temp dirs)', () => {
     expect(existsSync(join(proj, 'vault', 'brain', 'North Star.md'))).toBe(true);
     expect(existsSync(join(proj, '.claude', 'commands', 'om-standup.md'))).toBe(true);
   });
+
+  it('express respects an explicit --project root (OneDrive-safe path from the installer)', async () => {
+    const proj = join(dir, 'OneDrive', 'Desktop', 'Projects');
+    const run = async (cmd, args) => ({ ok: true, code: 0, stdout: (args && args[1] === 'list' ? '' : 'ok 1.0'), stderr: '' });
+    const ctx = { env: { os: 'windows', pkgManager: 'winget', home: dir, stamp: 'S1', today: '2026-06-08', run, io: null, express: true, projectRoot: proj }, answers: {}, results: {} };
+    const steps = [claudeCheck, prereqs, plugins, claudemd, hooks, secondbrain, northstar, qmd, mcpServers, skills, loops, summary];
+    const out = await runWizard(steps, ctx, { decide: async () => 'skip', ui: noUI() });
+    expect(out.aborted).toBe(false);
+    expect(existsSync(join(proj, 'CLAUDE.md'))).toBe(true);
+    expect(existsSync(join(proj, 'vault', 'brain', 'North Star.md'))).toBe(true);
+  });
 });

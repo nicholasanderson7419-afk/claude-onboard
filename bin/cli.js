@@ -38,7 +38,9 @@ function today() {
 }
 
 const express = process.argv.includes('--express');
-const ctx = await buildContext({ platform: process.platform, home: homedir(), stamp: stamp(), today: today(), run, io: express ? null : clackIo(), express });
+const pIdx = process.argv.indexOf('--project');
+const projectRoot = pIdx >= 0 ? process.argv[pIdx + 1] : null;
+const ctx = await buildContext({ platform: process.platform, home: homedir(), stamp: stamp(), today: today(), run, io: express ? null : clackIo(), express, projectRoot });
 const steps = [claudeCheck, prereqs, plugins, claudemd, hooks, secondbrain, northstar, qmd, mcpServers, skills, loops, summary];
 
 try {
