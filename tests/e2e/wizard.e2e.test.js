@@ -84,13 +84,17 @@ describe('end-to-end wizard run (fake io, fake run, temp dirs)', () => {
   it('guided mode asks only the goal question and maps it to plugins', async () => {
     const proj = join(dir, 'Desktop', 'Projects');
     const run = async (cmd, args) => ({ ok: true, code: 0, stdout: (args && args[1] === 'list' ? '' : 'ok 1.0'), stderr: '' });
-    const io = { multiselect: async () => ['write'], text: async () => '', confirm: async () => true, select: async () => 'skip' };
+    const io = { multiselect: async () => ['write'], text: async () => '', confirm: async () => true, select: async () => 'emerald' };
     const ctx = { env: { os: 'linux', pkgManager: 'apt', home: dir, stamp: 'S1', today: '2026-06-08', run, io, guided: true, projectRoot: proj }, answers: {}, results: {} };
     const steps = [claudeCheck, prereqs, plugins, claudemd, hooks, secondbrain, northstar, qmd, mcpServers, skills, loops, summary];
     const out = await runWizard(steps, ctx, { decide: async () => 'skip', ui: noUI() });
     expect(out.aborted).toBe(false);
     expect(ctx.answers.plugins.some(p => p.name === 'obsidian')).toBe(true);    // 'write' -> obsidian
     expect(ctx.answers.plugins.some(p => p.name === 'superpowers')).toBe(true); // core always
+    expect(ctx.answers.colorScheme).toBe('emerald');
+    expect(existsSync(join(proj, 'vault', '.obsidian', 'snippets', 'emerald.css'))).toBe(true);
+    const ap = JSON.parse(readFileSync(join(proj, 'vault', '.obsidian', 'appearance.json'), 'utf8'));
+    expect(ap.enabledCssSnippets).toContain('emerald');
     expect(existsSync(join(proj, 'CLAUDE.md'))).toBe(true);
   });
 });
