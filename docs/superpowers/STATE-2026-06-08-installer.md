@@ -1,32 +1,37 @@
 # claude-onboard — Resume State (2026-06-08)
 
 ## Product direction
-Digital product: "all-in-one Claude vibe-coder install." MVP = **one-line installer** (no zip), repo PUBLIC.
+Digital product: "all-in-one Claude vibe-coder install." MVP = **one-line installer** (no zip). Repo PUBLIC.
 - Repo: https://github.com/nicholasanderson7419-afk/claude-onboard (PUBLIC)
-- Windows line: `irm https://raw.githubusercontent.com/nicholasanderson7419-afk/claude-onboard/master/install.ps1 | iex`
-- Mac/Linux line: `curl -fsSL .../install.sh | bash`
+- **Windows:** `irm https://raw.githubusercontent.com/nicholasanderson7419-afk/claude-onboard/master/install.ps1 | iex`
+- **Mac/Linux:** `curl -fsSL https://raw.githubusercontent.com/nicholasanderson7419-afk/claude-onboard/master/install.sh | bash`
 
-## DONE
-- `--express` no-questions wizard mode (92 tests pass).
-- install.ps1 / install.sh: install Claude app + Claude Code CLI + Node + Git (+ Python on Win) + Obsidian APP, clone repo, run express wizard.
-- One-pass sign-in via `claude auth login`; auth check via `claude auth status` ("loggedIn":true).
-- Plugin-list parser made marker-tolerant (❯ or >). Verify trusts install success.
-- First fresh-machine run: ~everything worked; all 9 plugins installed+enabled (false "not found" was the parser bug, fixed).
+## ✅ WINDOWS INSTALLER — DONE + VALIDATED LIVE (2026-06-08)
+Ran clean end-to-end on a fresh Windows desktop, ONE line, ONE pass:
+- Installed Claude app + Obsidian app + Node + Git via winget.
+- **One-pass sign-in** worked (`claude auth login` → browser → "Login successful" → auto-continued). No re-run.
+- **OneDrive Desktop resolved** correctly (configured to `OneDrive\Desktop\Projects` via `[Environment]::GetFolderPath('Desktop')` + `--project` passed to wizard).
+- All 9 plugins installed + enabled; vault + memory + QMD + North Star + /om-standup + llm-council + 7 trading skills — **"All steps verified," zero ✗.**
+- 93 automated tests pass.
 
-## OPEN BUGS (fix next)
-1. **PATH after winget**: right after winget installs Claude, `claude` not reliably on PATH in the SAME PowerShell session. Refresh-Path (registry read) insufficient on Nick's machine. Likely fix: add winget Links dir (`%LOCALAPPDATA%\Microsoft\WinGet\Links`) to session PATH, and/or if `claude` still not callable, instruct "open a NEW PowerShell and paste the line again."
-2. **OneDrive Desktop redirection**: Nick's Desktop = `C:\Users\nicho\OneDrive\Desktop`, not `$HOME\Desktop`. Script's `$HOME\Desktop\Projects` may land wrong. Fix: resolve the real Desktop via `[Environment]::GetFolderPath('Desktop')`.
-3. **Nick's personal env only (NOT a product bug)**: his OneDrive-synced `Microsoft.PowerShell_profile.ps1` has a `claude` wrapper expecting `claude.exe` → throws when claude not on PATH. A real new user won't have this. His test machine isn't truly fresh (OneDrive synced profile + Desktop).
+### Fixes that got it there (all pushed)
+- `--express` no-questions wizard mode.
+- Installers add Claude app + Obsidian app + Claude CLI + Node + Git (+Python on Win).
+- One-pass sign-in via `claude auth login`; auth check `claude auth status` ("loggedIn":true).
+- PATH fix: force `~/.local/bin` (where claude.exe lives) onto session PATH after winget; fallback "open new window."
+- OneDrive-safe Desktop: installer resolves real Desktop + passes `--project` to wizard.
+- Plugin-list parser marker-tolerant (❯ or >); verify trusts install success (no false "not found").
+- install.ps1 is ASCII-only (em-dash broke parsing); both scripts syntax-checked.
 
-## DEFERRED — Obsidian full second brain ("come back to this")
-Make the vault IDENTICAL to Nick's machine. His vault (`Desktop/Projects/.obsidian`) runs 5 community plugins:
-- smart-connections (Karpathy-style local embeddings; `.smart-env`)
-- dataview (hierarchy indexing)
-- templater-obsidian
-- obsidian-mindmap-nextgen
-- obsidian-local-llm-helper
+### Remaining 1% (low risk)
+- The test machine still had the Claude CLI (`claude: already installed`), so the **brand-new-claude-from-zero install path wasn't exercised**. Standard winget pkg; validate on a machine that never had Claude.
 
-Plan: bundle those 5 plugin builds + a clean `.obsidian` config (community-plugins.json + sane settings) into `assets/obsidian/`; wizard copies into the new vault's `.obsidian`. EXCLUDE embeddings (huge, auto-regenerate). SCAN + STRIP any API keys in plugin `data.json` before bundling. Smart Connections re-indexes on the new machine.
+## NEXT (pick one)
+1. **Concierge goal-interview** (Nick's idea, recommended UX upgrade): ask "what do you want to do?" in plain English → auto-pick + explain plugins (NO plugin jargon). Keep `--express` as the "skip" fast lane. Bonus: feed North Star goals to Claude to auto-recommend.
+2. **Full Obsidian second brain** (deferred — make vault IDENTICAL to Nick's): bundle his 5 community plugins + clean `.obsidian` config into `assets/obsidian/`; wizard copies into the new vault. Plugins: smart-connections (Karpathy embeddings), dataview, templater-obsidian, obsidian-mindmap-nextgen, obsidian-local-llm-helper. EXCLUDE embeddings (huge, auto-regen). SCAN+STRIP any API keys in plugin data.json. (Obsidian APP itself already installs.)
+3. **Landing page** (sub-project #2 — makes it sellable).
+4. **Test Mac** live (only Windows proven).
 
-## NEXT SUB-PROJECTS (after installer solid)
-2. Landing page (sells config, hosts one line). 3. Monetization. 4. Marketing.
+## Known follow-ups
+- Mac `install.sh` untested live (nvm pin v0.40.1; Obsidian via brew cask).
+- Two-pass fallback still exists if claude not on PATH (rare now).
