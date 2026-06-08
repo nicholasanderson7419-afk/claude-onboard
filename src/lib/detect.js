@@ -21,7 +21,7 @@ export function parsePluginList(stdout) {
   const lines = stdout.split(/\r?\n/);
   let cur = null;
   for (const line of lines) {
-    const head = line.match(/❯\s+([^@\s]+)@(\S+)/);
+    const head = line.match(/^\s*[^\sA-Za-z0-9]?\s*([A-Za-z0-9._-]+)@(\S+)\s*$/);
     if (head) { cur = { name: head[1], marketplace: head[2], enabled: false }; out.push(cur); continue; }
     if (cur && /Status:/.test(line)) cur.enabled = /enabled/i.test(line) && !/disabled/i.test(line);
   }

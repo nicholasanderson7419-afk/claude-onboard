@@ -51,6 +51,25 @@ describe('parsePluginList', () => {
   it('returns [] for empty output', () => {
     expect(parsePluginList('Installed plugins:\n')).toEqual([]);
   });
+
+  it('handles the plain ">" marker (newer Claude CLI / non-fancy terminals)', () => {
+    const out = `Installed plugins:
+
+  > superpowers@superpowers-marketplace
+    Version: 5.1.0
+    Scope: user
+    Status: √ enabled
+
+  > obsidian@obsidian-skills
+    Version: 1.0.1
+    Scope: user
+    Status: √ enabled
+`;
+    expect(parsePluginList(out)).toEqual([
+      { name: 'superpowers', marketplace: 'superpowers-marketplace', enabled: true },
+      { name: 'obsidian', marketplace: 'obsidian-skills', enabled: true }
+    ]);
+  });
 });
 
 describe('parseMcpList', () => {
