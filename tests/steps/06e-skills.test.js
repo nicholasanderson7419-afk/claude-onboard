@@ -25,7 +25,7 @@ function fakeRunCloning() {
 }
 
 describe('step 06e skills', () => {
-  it('clones llm-council, copies bundled trading skills + om-* commands', async () => {
+  it('clones llm-council + copies om-* commands (default full set)', async () => {
     const { run, calls } = fakeRunCloning();
     const proj = join(dir, 'proj');
     const ctx = { env: { home: dir, run }, answers: { wantSkills: true, projectDir: proj }, results: {} };
@@ -55,5 +55,41 @@ describe('step 06e skills', () => {
     await step.apply(ctx);
     const v = await step.verify(ctx);
     expect(v.checks.every(c => c.pass)).toBe(true);
+  });
+
+  it('guided "write" -> council + om-* commands', async () => {
+    const { run } = fakeRunCloning();
+    const proj = join(dir, 'proj');
+    const ctx = { env: { home: dir, run, guided: true, io: {} }, answers: { goals: ['write'], projectDir: proj }, results: {} };
+    const sel = await step.prompt(ctx);
+    expect(sel.wantSkills).toBe(true);
+    Object.assign(ctx.answers, sel);
+    const res = await step.apply(ctx);
+    expect(res.ok).toBe(true);
+    expect(existsSync(join(dir, '.claude', 'skills', 'llm-council', 'SKILL.md'))).toBe(true);
+    expect(existsSync(join(proj, '.claude', 'commands', 'om-dump.md'))).toBe(true);
+  });
+
+  it('guided "build" -> council only, NO om-* commands', async () => {
+    const { run } = fakeRunCloning();
+    const proj = join(dir, 'proj');
+    const ctx = { env: { home: dir, run, guided: true, io: {} }, answers: { goals: ['build'], projectDir: proj }, results: {} };
+    const sel = await step.prompt(ctx);
+    expect(sel.skills).toEqual({ council: true, omCommands: false });
+    Object.assign(ctx.answers, sel);
+    await step.apply(ctx);
+    expect(existsSync(join(dir, '.claude', 'skills', 'llm-council', 'SKILL.md'))).toBe(true);
+    expect(existsSync(join(proj, '.claude', 'commands', 'om-dump.md'))).toBe(false);
+  });
+
+  it('guided "automate" -> no skills installed at all', async () => {
+    const { run, calls } = fakeRunCloning();
+    const ctx = { env: { home: dir, run, guided: true, io: {} }, answers: { goals: ['automate'] }, results: {} };
+    const sel = await step.prompt(ctx);
+    expect(sel.wantSkills).toBe(false);
+    Object.assign(ctx.answers, sel);
+    const res = await step.apply(ctx);
+    expect(res.ok).toBe(true);
+    expect(calls.length).toBe(0);
   });
 });

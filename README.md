@@ -163,7 +163,7 @@ Answer the questions — **arrow keys** move, **Space** ticks/unticks, **Enter**
 - **Your North Star goals** + the `/om-standup` daily kickoff command.
 - **QMD** — private semantic search over your notes, runs entirely on your machine.
 - **Optional MCP servers** — browser automation (playwright), agent orchestration (ruflo, claude-flow).
-- **Optional extra skills** — `llm-council` (a 5-advisor decision council), prediction-market + trading skills, and the `om-*` command suite.
+- **Optional extra skills** — `llm-council` (a 5-advisor decision council) and the `om-*` command suite. In guided mode, the plugins, MCP servers, and skills are tailored to the goals you pick.
 
 # Is it safe?
 Yes — it **backs up** any file before changing it, **never overwrites** your notes, and is **safe to re-run** (it skips anything already done). If a step fails you get **Retry / Skip / Stop**, never a crash.

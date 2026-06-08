@@ -1,4 +1,5 @@
 import { MCP_SERVERS } from '../data/mcp.js';
+import { mcpForGoals } from '../data/goals.js';
 import { addMcp, mcpList } from '../lib/claude.js';
 import { parseMcpList } from '../lib/detect.js';
 import { check } from '../lib/verify.js';
@@ -15,6 +16,10 @@ export default {
   },
   async prompt(ctx) {
     const io = ctx.env.io;
+    // Concierge: tailor MCP servers to the stated goals (set by step 03).
+    if (ctx.env.guided && Array.isArray(ctx.answers.goals) && ctx.answers.goals.length) {
+      return { mcpServers: mcpForGoals(ctx.answers.goals, MCP_SERVERS) };
+    }
     if (!io || ctx.env.guided) return { mcpServers: [] };
     const options = MCP_SERVERS.filter(s => s.available)
       .map(s => ({ value: s.name, label: s.name, hint: s.desc }));

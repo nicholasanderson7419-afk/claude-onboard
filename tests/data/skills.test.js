@@ -8,11 +8,12 @@ describe('skills data', () => {
     expect(c.repo).toBe('https://github.com/tenfoldmarc/llm-council-skill');
   });
 
-  it('bundles the 7 trading skills', () => {
-    expect([...BUNDLED_SKILLS].sort()).toEqual([
+  it('no longer bundles the trading skills (pulled from the sold product 2026-06-08)', () => {
+    expect(BUNDLED_SKILLS).toEqual([]);
+    for (const t of [
       'ito-basket-compare', 'ito-data-atlas-agent', 'ito-market-intelligence', 'ito-trade-planner',
       'llm-trading-agent-security', 'prediction-market-oracle-research', 'prediction-market-risk-review'
-    ].sort());
+    ]) expect(BUNDLED_SKILLS).not.toContain(t);
   });
 
   it('bundles 17 om-* commands and excludes om-standup (owned by the North Star step)', () => {

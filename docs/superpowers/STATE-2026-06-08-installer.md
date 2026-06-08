@@ -4,7 +4,7 @@
 - Repo (PUBLIC): https://github.com/nicholasanderson7419-afk/claude-onboard
 - **Landing page (waitlist):** https://nicholasanderson7419-afk.github.io/claude-onboard/
 - Windows: `irm https://raw.githubusercontent.com/nicholasanderson7419-afk/claude-onboard/master/install.ps1 | iex`
-- Mac/Linux: `curl -fsSL https://raw.githubusercontent.com/nicholasanderson7419-afk/claude-onboard/master/install.sh | bash`
+- Mac/Linux: `bash <(curl -fsSL https://raw.githubusercontent.com/nicholasanderson7419-afk/claude-onboard/master/install.sh)`
 - 100 automated tests pass.
 
 ## ✅ DONE
@@ -12,6 +12,7 @@
 - **Phase 2 — Full Obsidian second brain:** bundles 5 community plugins (smart-connections, dataview, templater-obsidian, obsidian-mindmap-nextgen, obsidian-local-llm-helper) into the new vault's `.obsidian` (code only — no personal data.json, no embeddings). assets/obsidian/ (~14MB).
 - **Phase 1 — Concierge `--guided` mode:** asks ONE plain-English goal question ("what do you want to do?") -> maps to plugins (no jargon). Falls back to recommended defaults if terminal can't prompt. `--express` still exists (zero-question). Installer now runs `--guided`. Goal->plugin map in src/data/goals.js.
 - **Phase 3 — Landing page + waitlist:** index.html (hero, OS-toggle one-liner + copy, what-you-get, how-it-works, email form). GitHub Pages enabled (master/root).
+- **Concierge deepened (2026-06-08):** the one goal question now also wires **MCP servers + skills**, not just plugins — `build`→playwright, `automate`→ruflo+claude-flow, `write`→om-* suite + llm-council, `build`→llm-council. Zero new questions (reads goals stored by step 03). **Trading skills PULLED** from the sold product (Nick's edge, not for a $39 general audience) — removed from `BUNDLED_SKILLS` + deleted from `assets/skills/`. 119 tests pass.
 
 ## ⚠️ OPEN / NEEDS ACTION
 1. **Waitlist email capture NOT live yet** — index.html form posts to `https://formspree.io/f/YOUR_FORM_ID` (placeholder). Nick: make a free Formspree form (formspree.io, ~2 min), replace `YOUR_FORM_ID` in index.html. Until then signups go nowhere.
@@ -22,4 +23,4 @@
 ## NEXT SUB-PROJECTS
 - Monetization (after waitlist shows demand): free vs paid, license gate, Stripe.
 - True 1-click GUI installer (Phase-2 of the original plan) if demand warrants.
-- Extend concierge: let the goal answer also drive MCP servers + skills (currently drives plugins only).
+- ~~Extend concierge to drive MCP + skills~~ — DONE 2026-06-08 (goal now tailors plugins + MCP + skills; see DONE above).

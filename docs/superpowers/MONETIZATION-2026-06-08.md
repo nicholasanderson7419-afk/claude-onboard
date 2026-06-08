@@ -49,3 +49,12 @@ The **install is commoditized + free** — Claude Code Launchpad (free, open-sou
 - **Model:** undecided — wants more research + real demand signal before committing. Leaning "charge a base fee" (one-time) rather than gated freemium.
 - **Idea to develop:** the concierge INTERVIEW can power a "Pro level" — a deeper/smarter tailoring pass as the upsell (e.g., Pro = a richer interview + a fuller custom setup). Park until demand shows.
 - **Next:** validate first (waitlist needs Formspree ID). Don't build payment until signups prove interest.
+
+## LOCKED (2026-06-08, PM session)
+- **Model:** Paid-only, **$39 one-time**, via **Polar** (auto-invites buyer to a private GitHub repo on purchase; ~5% + $0.50 fee -> ~$36.55 net). Nick: "idk yes" — committed but soft; acceptable because it's reversible (no backend lock-in, can swap rails later).
+- **Guarantee:** YES — money-back (14-day, no-questions), stated prominently on the sales page. Research: biggest single conversion lever for cold paid-only traffic.
+- **Channel:** Nick will **run paid ads** (diverges from research rec of Reddit/X build-in-public).
+  - FLAGGED: $39 one-time + cold paid ads = underwater unit economics (net ~$36.55 vs ~$50 CAC at 2% conv / $1 CPC). One-time = no recurring LTV to repay ad spend. Ads are viable as a small VALIDATION probe (~$100 fast yes/no), not as a profit engine at this price. Nick's call — recorded, proceeding.
+- **Positioning (from research):** sell the curated SYSTEM / "a brain, not a blank Claude" — never "easier install." Launchpad (16-star free installer) confirms install = $0; gate the PAYLOAD, not the bootstrapper.
+- **Forced build order (ads depend on this):** (1) Polar product + gate payload -> (2) buy button + demo video + guarantee on landing -> (3) conversion tracking (UTM/pixel) -> (4) ads. Decision #1 is the unblocker for #3.
+- **Launchpad competitive check (2026-06-08):** noambrand/launchpad-cli, 16 stars, solo dev, install-layer only, zero curation creep, founder's real axis = RTL/Hebrew terminal. Threat low + static. Steal: ship a demo video (they do).

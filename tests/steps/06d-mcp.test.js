@@ -66,4 +66,26 @@ describe('step 06d mcp-servers', () => {
     const v = await step.verify({ env: { run }, answers: { mcpServers: [] }, results: {} });
     expect(v.checks[0].pass).toBe(true);
   });
+
+  it('guided mode maps goals -> MCP servers (build -> playwright)', async () => {
+    const { run } = fakeRun();
+    const ctx = { env: { run, guided: true, io: {} }, answers: { goals: ['build'] }, results: {} };
+    const out = await step.prompt(ctx);
+    expect(out.mcpServers.map(s => s.name)).toContain('playwright');
+  });
+
+  it('guided mode maps automate -> ruflo + claude-flow', async () => {
+    const { run } = fakeRun();
+    const ctx = { env: { run, guided: true, io: {} }, answers: { goals: ['automate'] }, results: {} };
+    const out = await step.prompt(ctx);
+    const names = out.mcpServers.map(s => s.name);
+    expect(names).toContain('ruflo');
+    expect(names).toContain('claude-flow');
+  });
+
+  it('guided mode with no answerable goal selects nothing', async () => {
+    const { run } = fakeRun();
+    const out = await step.prompt({ env: { run, guided: true, io: {} }, answers: {}, results: {} });
+    expect(out.mcpServers).toEqual([]);
+  });
 });

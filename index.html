@@ -143,7 +143,7 @@
   document.getElementById('yr').textContent = new Date().getFullYear();
   var CMDS = {
     win: 'irm https://raw.githubusercontent.com/nicholasanderson7419-afk/claude-onboard/master/install.ps1 | iex',
-    mac: 'curl -fsSL https://raw.githubusercontent.com/nicholasanderson7419-afk/claude-onboard/master/install.sh | bash'
+    mac: 'bash <(curl -fsSL https://raw.githubusercontent.com/nicholasanderson7419-afk/claude-onboard/master/install.sh)'
   };
   var cmdEl = document.getElementById('cmd');
   document.querySelectorAll('.os button').forEach(function(b){

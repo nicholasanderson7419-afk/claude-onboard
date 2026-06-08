@@ -1,9 +1,15 @@
 // Extra skills + slash-commands the wizard can install, by source type.
 //
-// CLONE_SKILLS  — have a real upstream repo → git clone into ~/.claude/skills/<name>
-// BUNDLED_SKILLS — no upstream (Nick's custom); shipped in assets/skills/<name> → copied to ~/.claude/skills/<name>
-// BUNDLED_COMMANDS — shipped in assets/commands/<file> → copied to <projectDir>/.claude/commands/<file>
+// CLONE_SKILLS    — have a real upstream repo -> git clone into ~/.claude/skills/<name>
+// BUNDLED_SKILLS  — local-only skills shipped in assets/skills/<name> -> copied to ~/.claude/skills/<name>
+// BUNDLED_COMMANDS — shipped in assets/commands/<file> -> copied to <projectDir>/.claude/commands/<file>
 //   (om-standup is created by the North Star step, so it is NOT bundled here.)
+//
+// NOTE (2026-06-08): the 7 trading skills (ito-*, prediction-market-*,
+// llm-trading-agent-security) were removed from the sold product — Nick's
+// personal trading edge, not for a general $39 audience. BUNDLED_SKILLS is now
+// empty; the loop in step 06e is kept so future general-purpose bundled skills
+// can be added without code changes.
 
 export const CLONE_SKILLS = [
   {
@@ -13,15 +19,7 @@ export const CLONE_SKILLS = [
   }
 ];
 
-export const BUNDLED_SKILLS = [
-  'prediction-market-oracle-research',
-  'prediction-market-risk-review',
-  'ito-trade-planner',
-  'ito-market-intelligence',
-  'ito-basket-compare',
-  'ito-data-atlas-agent',
-  'llm-trading-agent-security'
-];
+export const BUNDLED_SKILLS = [];
 
 export const BUNDLED_COMMANDS = [
   'om-capture-1on1.md', 'om-dump.md', 'om-humanize.md', 'om-incident-capture.md',
