@@ -65,6 +65,7 @@ describe('end-to-end wizard run (fake io, fake run, temp dirs)', () => {
     expect(existsSync(join(dir, '.claude', 'CLAUDE.md'))).toBe(true);
     expect(existsSync(join(proj, 'vault', 'brain', 'North Star.md'))).toBe(true);
     expect(existsSync(join(proj, '.claude', 'commands', 'om-standup.md'))).toBe(true);
+    expect(existsSync(join(proj, 'vault', '.obsidian', 'community-plugins.json'))).toBe(true);
   });
 
   it('express respects an explicit --project root (OneDrive-safe path from the installer)', async () => {
