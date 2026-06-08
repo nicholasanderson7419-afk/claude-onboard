@@ -66,6 +66,8 @@ describe('end-to-end wizard run (fake io, fake run, temp dirs)', () => {
     expect(existsSync(join(proj, 'vault', 'brain', 'North Star.md'))).toBe(true);
     expect(existsSync(join(proj, '.claude', 'commands', 'om-standup.md'))).toBe(true);
     expect(existsSync(join(proj, 'vault', '.obsidian', 'community-plugins.json'))).toBe(true);
+    expect(existsSync(join(proj, 'vault', '.obsidian', 'plugins', 'templater-obsidian', 'data.json'))).toBe(true); // settings wired, not just code
+    expect(existsSync(join(proj, 'vault', '.obsidian', 'core-plugins.json'))).toBe(true);
   });
 
   it('express respects an explicit --project root (OneDrive-safe path from the installer)', async () => {

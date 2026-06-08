@@ -44,7 +44,7 @@ export default {
     }
     const changes = [];
     scaffoldTree(vaultPath, {
-      'brain/': null, 'wiki/concepts/': null, 'raw/': null,
+      'brain/': null, 'wiki/concepts/': null, 'raw/': null, 'Templates/': null,
       'MEMORY.md': readFileSync(join(tplDir, 'MEMORY.md'), 'utf8')
     });
     // NOTE: North Star.md is intentionally NOT seeded here — Task 18b (North Star
@@ -54,10 +54,10 @@ export default {
     // Bundle the Obsidian community plugins (smart-connections, dataview, templater, mindmap, local-llm-helper)
     // into the vault so the second brain matches the reference setup. Code only — no personal data.json, no embeddings.
     if (existsSync(obsidianDir)) {
-      const odest = join(vaultPath, '.obsidian');
-      copyTree(join(obsidianDir, 'plugins'), join(odest, 'plugins'));
-      copyTree(join(obsidianDir, 'community-plugins.json'), join(odest, 'community-plugins.json'));
-      changes.push('Obsidian community plugins bundled into vault/.obsidian (enable in Obsidian on first open)');
+      // Copy the whole .obsidian config — plugin CODE + cleaned SETTINGS (data.json), enabled list,
+      // core plugins, app + appearance — so the second brain is actually WIRED, not just present.
+      copyTree(obsidianDir, join(vaultPath, '.obsidian'));
+      changes.push('Obsidian plugins + settings wired into vault/.obsidian (click "Enable community plugins" once on first open)');
     }
 
     const r = await addMcp(ctx.env.run, 'obsidian-vault', 'user',
