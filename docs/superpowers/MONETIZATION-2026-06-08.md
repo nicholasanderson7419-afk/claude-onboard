@@ -42,3 +42,10 @@ The **install is commoditized + free** — Claude Code Launchpad (free, open-sou
 - Pro price ($29 / $39 / $49)?
 - Free vs Pro line (does trading + full-Obsidian go behind Pro, or stay free)?
 - Payment rail (Gumroad vs Stripe)?
+
+## DECISIONS (Nick, 2026-06-08)
+- **Price:** $39 one-time base fee.
+- **Now:** keep EVERYTHING free — no paywall/gating yet. Pure lead magnet to validate demand via the waitlist.
+- **Model:** undecided — wants more research + real demand signal before committing. Leaning "charge a base fee" (one-time) rather than gated freemium.
+- **Idea to develop:** the concierge INTERVIEW can power a "Pro level" — a deeper/smarter tailoring pass as the upsell (e.g., Pro = a richer interview + a fuller custom setup). Park until demand shows.
+- **Next:** validate first (waitlist needs Formspree ID). Don't build payment until signups prove interest.
