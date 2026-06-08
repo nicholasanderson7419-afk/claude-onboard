@@ -2,11 +2,40 @@
 
 A friendly setup wizard that gets **Claude Code** fully configured for you — plugins, memory files, a notes "second brain" with **semantic search**, and your personal **North Star** goals — all by answering a few simple questions. No technical knowledge needed.
 
-**Mac only.** This guide assumes you're on a **Mac** and have never used the Terminal. Windows and Linux are **not** covered. Just follow along in order.
+Works on **Mac** and **Windows**. Never used a terminal? Just copy-paste exactly what you see. **Windows → do Part 1 (Windows). Mac → do Part 1 (Mac).** Parts 2–3 are the same for both.
 
 ---
 
-## Part 1 — Get Claude Code first (one-time, before the wizard)
+## Part 1 (Windows) — install everything with winget (fast)
+
+Windows 10/11 has **winget** built in. This installs Claude Code, Node.js, Git, GitHub CLI, and Python in one shot.
+
+1. You need a paid Claude plan (Pro/Max): https://claude.com/pricing
+2. Open **PowerShell**: click **Start**, type **PowerShell**, press **Enter**.
+3. Paste these **one at a time**, pressing **Enter** after each (click **Yes** if Windows asks permission):
+   ```
+   winget install Anthropic.ClaudeCode
+   winget install OpenJS.NodeJS.LTS
+   winget install Git.Git
+   winget install GitHub.cli
+   winget install Python.Python.3.14
+   ```
+4. **Close PowerShell and open a NEW one** (so the new commands are found).
+5. Get the desktop app too: **https://claude.ai/download** — install and sign in.
+6. Sign in the CLI: type `claude`, press **Enter**, log in via the browser.
+7. Check it worked — each should print a version number:
+   ```
+   claude --version
+   node --version
+   git --version
+   python --version
+   ```
+
+➡️ **Windows users: now skip to [Part 2](#part-2--run-the-setup-wizard).** (Everything else is the same — just use PowerShell instead of Terminal.)
+
+---
+
+## Part 1 (Mac) — Get Claude Code first (one-time, before the wizard)
 
 The wizard sets up **Claude Code**. So you need Claude Code installed and signed in first.
 
@@ -82,20 +111,26 @@ When the wizard later asks for your **project folder**, give it `Desktop/Project
 **How to type a folder path when asked:** the easiest way — type nothing, just **drag the folder from Finder into the Terminal** and it fills in the path for you. Or type it by hand like `~/Desktop/Projects` (the `~` means "my home folder").
 
 ### 1. Get the project with git (no zip)
-You'll pull the project straight onto your Mac — nothing to download or unzip.
+You'll pull the project straight onto your machine — nothing to download or unzip. Use **PowerShell** (Windows) or **Terminal** (Mac).
 
-1. **First time only — sign in to GitHub from the Terminal.** Easiest is the GitHub CLI:
+1. **Sign in to GitHub (first time only).** You already have the GitHub CLI (`gh`) from Part 1.
    ```
-   brew install gh
    gh auth login
    ```
-   Choose **GitHub.com → HTTPS → Login with a web browser** and follow the prompts. (No Homebrew? Get `gh` from https://cli.github.com — or ask Nick.)
+   Choose **GitHub.com → HTTPS → Login with a web browser** and follow the prompts.
+   *(Mac only, if `gh` is missing: run `brew install gh` first.)*
 
-2. **Clone it into your home base:**
-   ```
-   cd ~/Desktop/Projects
-   gh repo clone nicholasanderson7419-afk/claude-onboard
-   ```
+2. **Make your home base and clone into it:**
+   - **Windows (PowerShell):**
+     ```
+     cd $HOME\Desktop ; mkdir Projects\vault -Force ; cd Projects
+     gh repo clone nicholasanderson7419-afk/claude-onboard
+     ```
+   - **Mac (Terminal):**
+     ```
+     mkdir -p ~/Desktop/Projects/vault && cd ~/Desktop/Projects
+     gh repo clone nicholasanderson7419-afk/claude-onboard
+     ```
    A `claude-onboard` folder appears inside `Desktop/Projects`.
 
 ### 2. Go into the folder
@@ -250,9 +285,10 @@ Yes:
 - If a step fails, you get **Retry / Skip / Stop**, never a crash that breaks things.
 
 ## Requirements recap
-- A **Mac** — these instructions are **Mac only** (Windows/Linux not covered).
+- A **Mac** or **Windows 10/11** PC.
 - **Claude Code** installed and signed in (Part 1).
-- **Node.js 18+** — you install this yourself (Part 1, Step C). It does **not** come bundled with Claude Code.
+- **Node.js 18+** — install it yourself (Windows: `winget install OpenJS.NodeJS.LTS`; Mac: Part 1 Step C). It does **not** come with Claude Code.
+- Windows winget also installs **Git, GitHub CLI, and Python 3.14** in Part 1.
 
 ## If you get stuck
 Text Nick exactly what the Terminal says (a screenshot is perfect). The wizard is designed to fail safely, so you can't really break anything.
