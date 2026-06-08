@@ -26,6 +26,22 @@ describe('claude wrappers', () => {
     expect(calls[0]).toEqual(['claude', ['mcp', 'add', 'memory', '-s', 'user', '--', 'npx', '-y', '@modelcontextprotocol/server-memory']]);
   });
 
+  it('addMcp injects -e KEY=VAL env flags before the -- separator', async () => {
+    const { run, calls } = spy();
+    await addMcp(run, 'claude-flow', 'user',
+      ['npx', '-y', '@claude-flow/cli@latest', 'mcp', 'start'],
+      { CLAUDE_FLOW_MODE: 'v3', CLAUDE_FLOW_MAX_AGENTS: '8' });
+    expect(calls[0]).toEqual(['claude', ['mcp', 'add', 'claude-flow', '-s', 'user',
+      '-e', 'CLAUDE_FLOW_MODE=v3', '-e', 'CLAUDE_FLOW_MAX_AGENTS=8',
+      '--', 'npx', '-y', '@claude-flow/cli@latest', 'mcp', 'start']]);
+  });
+
+  it('addMcp with no env behaves exactly as before (no -e flags)', async () => {
+    const { run, calls } = spy();
+    await addMcp(run, 'memory', 'user', ['npx', '-y', '@modelcontextprotocol/server-memory']);
+    expect(calls[0]).toEqual(['claude', ['mcp', 'add', 'memory', '-s', 'user', '--', 'npx', '-y', '@modelcontextprotocol/server-memory']]);
+  });
+
   it('pluginList passes through stdout', async () => {
     const run = async () => ({ ok: true, code: 0, stdout: 'PLUGINS', stderr: '' });
     expect((await pluginList(run)).stdout).toBe('PLUGINS');

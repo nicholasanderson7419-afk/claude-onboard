@@ -162,7 +162,7 @@ And these are **optional** (tick the ones you want):
 | **gh-cli** | GitHub integration (needs the `gh` tool — installed automatically if you pick this). |
 | **code-review** | Anthropic's official code-review workflow (needs `gh`). |
 | **claude-video-vision** | Lets Claude watch and analyze videos (needs `ffmpeg` — installed automatically if you pick this). |
-| **create-viral-content** | *(Currently disabled — its source isn't available yet. Will be added later.)* |
+| **obsidian** | Obsidian vault skills — work with markdown notes, canvas, bases, and the Obsidian CLI. |
 
 ### 📝 Step 3 — Your CLAUDE.md files (Claude's instructions & memory)
 Asks you a few quick questions — your project folder, project name, a one-line description, any rules you care about — and writes:
@@ -196,10 +196,24 @@ Installs **QMD**, a private search engine over your notes, and points it at your
 - It indexes everything automatically and runs **entirely on your computer** (private — nothing uploaded).
 - **Heads up:** the first time you actually search a vault that has notes in it, QMD downloads its search "brain" (a few hundred MB, one time). At setup your vault is empty, so there's nothing to download yet — it just gets ready. The more notes you add, the more useful it gets.
 
-### ⏰ Step 8 — Optional daily automation
+### 🔌 Step 8 — Extra MCP servers (optional)
+A checklist of optional tool servers for Claude — **none preselected**, pick only what you want:
+- **playwright** — browser automation: navigate, click, screenshot, test web apps.
+- **ruflo** — agent orchestration, memory, and swarms.
+- **claude-flow** — swarms, memory, agents, and hive-mind coordination.
+
+(The vault, knowledge-graph memory, and search servers are set up separately in Steps 5 and 7.)
+
+### 🧩 Step 9 — Extra skills & commands (optional)
+Power-ups beyond the marketplace plugins:
+- **llm-council** — a 5-advisor "council" that pressure-tests a decision (independent analysis → anonymous peer-review → chairman synthesis). Cloned from its repo.
+- **trading skills** — prediction-market + Itô analysis: prediction-market-oracle-research, prediction-market-risk-review, ito-trade-planner, ito-market-intelligence, ito-basket-compare, ito-data-atlas-agent, llm-trading-agent-security.
+- **om-* command suite** — 17 second-brain slash commands (om-dump, om-weekly, om-wrap-up, om-vault-audit, 1-on-1 helpers…). `om-standup` is already added in Step 6.
+
+### ⏰ Step 10 — Optional daily automation
 If you want, it sets up a once-a-day scheduled Claude task. Totally optional — skip it if unsure.
 
-### ✅ Step 9 — Summary
+### ✅ Step 11 — Summary
 A clean ✓ / ✗ checklist showing exactly what got set up, with proof for each item.
 
 ---
@@ -222,4 +236,4 @@ Text Nick exactly what the Terminal says (a screenshot is perfect). The wizard i
 ---
 
 ### For the technically curious
-Built as a Node.js CLI, fully test-driven (67 automated tests + an end-to-end test). Run `npm test` to see them. The real `claude` CLI calls were validated read-only via `npm run smoke`. A couple of pre-1.0 notes: the `create-viral-content` plugin is disabled pending its source, and the `ffmpeg`-for-video dependency is auto-installed only if you pick the video plugin.
+Built as a Node.js CLI, fully test-driven (90 automated tests including an end-to-end test). Run `npm test` to see them. The real `claude` CLI calls were validated read-only via `npm run smoke`. A pre-1.0 note: the `ffmpeg`-for-video dependency is auto-installed only if you pick the video plugin.

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdtempSync, writeFileSync, readFileSync, existsSync, rmSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { backupFile, appendSection, mergeHooks, scaffoldTree } from '../../src/lib/writers.js';
+import { backupFile, appendSection, mergeHooks, scaffoldTree, copyTree } from '../../src/lib/writers.js';
 
 let dir;
 beforeEach(() => { dir = mkdtempSync(join(tmpdir(), 'co-')); });
@@ -102,5 +102,33 @@ describe('scaffoldTree', () => {
     const created = scaffoldTree(dir, { 'North Star.md': 'seed' });
     expect(readFileSync(join(dir, 'North Star.md'), 'utf8')).toBe('USER CONTENT');
     expect(created).not.toContain('North Star.md');
+  });
+});
+
+describe('copyTree', () => {
+  it('copies a file into a new dest, creating parent dirs', () => {
+    const src = join(dir, 'src.md'); writeFileSync(src, 'hello');
+    const res = copyTree(src, join(dir, 'a', 'b', 'dest.md'));
+    expect(res.skipped).toBe(false);
+    expect(readFileSync(join(dir, 'a', 'b', 'dest.md'), 'utf8')).toBe('hello');
+  });
+
+  it('copies a directory recursively', () => {
+    mkdirSync(join(dir, 'srcdir'), { recursive: true });
+    writeFileSync(join(dir, 'srcdir', 'SKILL.md'), 'skill');
+    copyTree(join(dir, 'srcdir'), join(dir, 'out'));
+    expect(readFileSync(join(dir, 'out', 'SKILL.md'), 'utf8')).toBe('skill');
+  });
+
+  it('skips when dest exists (idempotent, safe re-run)', () => {
+    const src = join(dir, 's.md'); writeFileSync(src, 'new');
+    const dest = join(dir, 'd.md'); writeFileSync(dest, 'OLD');
+    const res = copyTree(src, dest);
+    expect(res.skipped).toBe(true);
+    expect(readFileSync(dest, 'utf8')).toBe('OLD');
+  });
+
+  it('throws when source is missing', () => {
+    expect(() => copyTree(join(dir, 'nope'), join(dir, 'x'))).toThrow(/source missing/);
   });
 });

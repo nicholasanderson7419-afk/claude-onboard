@@ -4,7 +4,7 @@ export const MARKETPLACES = {
   'trailofbits': 'trailofbits/skills',
   'claude-plugins-official': 'anthropics/claude-plugins-official',
   'claude-video-vision': 'https://github.com/jordanrendric/claude-video-vision.git',
-  'aaaronmiller': null // OPEN ITEM: source unknown, must resolve before enabling
+  'obsidian-skills': 'kepano/obsidian-skills'
 };
 
 export const CORE = [
@@ -24,5 +24,5 @@ export const OPTIONAL = [
   { name: 'gh-cli', marketplace: 'trailofbits', available: true, needs: ['gh'] },
   { name: 'code-review', marketplace: 'claude-plugins-official', available: true, needs: ['gh'] },
   { name: 'claude-video-vision', marketplace: 'claude-video-vision', available: true, needs: ['ffmpeg'] },
-  { name: 'create-viral-content', marketplace: 'aaaronmiller', available: false }
+  { name: 'obsidian', marketplace: 'obsidian-skills', available: true }
 ];

@@ -14,6 +14,8 @@ import hooks from '../src/steps/05-hooks.js';
 import secondbrain from '../src/steps/06-secondbrain.js';
 import northstar from '../src/steps/06b-northstar.js';
 import qmd from '../src/steps/06c-qmd.js';
+import mcpServers from '../src/steps/06d-mcp.js';
+import skills from '../src/steps/06e-skills.js';
 import loops from '../src/steps/07-loops.js';
 import summary, { renderSummary } from '../src/steps/08-summary.js';
 
@@ -36,7 +38,7 @@ function today() {
 }
 
 const ctx = await buildContext({ platform: process.platform, home: homedir(), stamp: stamp(), today: today(), run, io: clackIo() });
-const steps = [claudeCheck, prereqs, plugins, claudemd, hooks, secondbrain, northstar, qmd, loops, summary];
+const steps = [claudeCheck, prereqs, plugins, claudemd, hooks, secondbrain, northstar, qmd, mcpServers, skills, loops, summary];
 
 try {
   const out = await runWizard(steps, ctx, { decide, ui });

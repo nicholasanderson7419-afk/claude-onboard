@@ -1,4 +1,4 @@
-import { existsSync, copyFileSync, constants, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, copyFileSync, constants, mkdirSync, writeFileSync, cpSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 
 export function backupFile(path, stamp) {
@@ -39,6 +39,16 @@ export function mergeHooks(settings, newHooks) {
     out.hooks[event] = current;
   }
   return out;
+}
+
+// Copy a file or directory from src to dest. Idempotent: skips if dest exists
+// (unless overwrite), so the wizard stays safe to re-run.
+export function copyTree(src, dest, { overwrite = false } = {}) {
+  if (!existsSync(src)) throw new Error(`source missing: ${src}`);
+  if (existsSync(dest) && !overwrite) return { dest, skipped: true };
+  mkdirSync(dirname(dest), { recursive: true });
+  cpSync(src, dest, { recursive: true, force: true });
+  return { dest, skipped: false };
 }
 
 export function scaffoldTree(root, tree) {

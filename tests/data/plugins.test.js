@@ -2,13 +2,14 @@ import { describe, it, expect } from 'vitest';
 import { MARKETPLACES, CORE, OPTIONAL } from '../../src/data/plugins.js';
 
 describe('plugin data', () => {
-  it('has 5 known marketplace sources (+ aaaronmiller flagged unknown)', () => {
+  it('has 6 known marketplace sources, all resolvable (no null)', () => {
     expect(MARKETPLACES['superpowers-marketplace']).toBe('obra/superpowers-marketplace');
     expect(MARKETPLACES['caveman']).toBe('JuliusBrussee/caveman');
     expect(MARKETPLACES['trailofbits']).toBe('trailofbits/skills');
     expect(MARKETPLACES['claude-plugins-official']).toBe('anthropics/claude-plugins-official');
     expect(MARKETPLACES['claude-video-vision']).toBe('https://github.com/jordanrendric/claude-video-vision.git');
-    expect(MARKETPLACES['aaaronmiller']).toBe(null);
+    expect(MARKETPLACES['obsidian-skills']).toBe('kepano/obsidian-skills');
+    expect(Object.values(MARKETPLACES).every(v => typeof v === 'string' && v.length > 0)).toBe(true);
   });
 
   it('core 6 are the agreed defaults', () => {
@@ -17,8 +18,18 @@ describe('plugin data', () => {
     );
   });
 
-  it('optional set excludes create-viral-content until aaaronmiller source is known', () => {
-    const cvc = OPTIONAL.find(p => p.name === 'create-viral-content');
-    expect(cvc.available).toBe(false);
+  it('ships obsidian (available) and no longer carries create-viral-content / aaaronmiller', () => {
+    const obsidian = OPTIONAL.find(p => p.name === 'obsidian');
+    expect(obsidian).toBeTruthy();
+    expect(obsidian.available).toBe(true);
+    expect(obsidian.marketplace).toBe('obsidian-skills');
+    expect(OPTIONAL.find(p => p.name === 'create-viral-content')).toBeUndefined();
+    expect(MARKETPLACES['aaaronmiller']).toBeUndefined();
+  });
+
+  it('every plugin references a known, resolvable marketplace', () => {
+    for (const p of [...CORE, ...OPTIONAL]) {
+      expect(MARKETPLACES[p.marketplace], `${p.name} -> ${p.marketplace}`).toBeTruthy();
+    }
   });
 });
