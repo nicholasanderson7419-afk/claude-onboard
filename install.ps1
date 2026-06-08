@@ -12,6 +12,8 @@ function Refresh-Path {
 Write-Host "`n=== claude-onboard: all-in-one Claude setup ===" -ForegroundColor Green
 
 Section "Installing tools (winget — can take a few minutes)"
+Write-Host "  installing the Claude desktop app (Anthropic.Claude) ..."
+winget install --id Anthropic.Claude -e --accept-source-agreements --accept-package-agreements 2>$null | Out-Null
 $pkgs = @(
   @{ id = 'Anthropic.ClaudeCode'; cmd = 'claude' },
   @{ id = 'OpenJS.NodeJS.LTS';    cmd = 'node'   },
