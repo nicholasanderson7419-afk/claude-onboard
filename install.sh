@@ -29,9 +29,18 @@ if ! have git; then
   else sudo apt-get update && sudo apt-get install -y git; fi
 fi
 
+say "Installing Obsidian (notes app)"
+if command -v brew >/dev/null 2>&1; then brew install --cask obsidian || true
+else printf "  (optional: install Obsidian from https://obsidian.md)\n"; fi
+
 say "Signing in to Claude"
-if ! claude -p "ok" >/dev/null 2>&1; then
-  printf "  One manual step: run 'claude' once and sign in, then re-run this installer.\n"
+claude_authed() { claude auth status 2>/dev/null | grep -Eq '"loggedIn"[[:space:]]*:[[:space:]]*true'; }
+if ! claude_authed; then
+  printf "  A sign-in will open — log into your Anthropic account...\n"
+  claude auth login || true
+fi
+if ! claude_authed; then
+  printf "  Not signed in yet. Run 'claude auth login', then re-run this installer.\n"
   exit 0
 fi
 
