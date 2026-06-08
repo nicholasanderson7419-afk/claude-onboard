@@ -17,7 +17,7 @@ export default {
     return 'Your North Star is a living goals file Claude reads at the start of every session, so it always knows what you are working toward. It is the single most useful piece of context you can give Claude — so we build it together now.';
   },
   async prompt(ctx) {
-    const io = ctx.env.io; if (!io) return {};
+    const io = ctx.env.io; if (!io || ctx.env.guided) return {};
     const nsFocus = (await io.text({ message: 'North Star — your current focus, one line?' })) || '';
     const nsShort = (await io.text({ message: 'Short-term goals (this quarter)? Optional.' })) || '';
     const nsMedium = (await io.text({ message: 'Medium-term goals (this half)? Optional.' })) || '';

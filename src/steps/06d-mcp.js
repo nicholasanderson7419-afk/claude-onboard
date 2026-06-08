@@ -15,7 +15,7 @@ export default {
   },
   async prompt(ctx) {
     const io = ctx.env.io;
-    if (!io) return { mcpServers: [] };
+    if (!io || ctx.env.guided) return { mcpServers: [] };
     const options = MCP_SERVERS.filter(s => s.available)
       .map(s => ({ value: s.name, label: s.name, hint: s.desc }));
     const selected = await io.multiselect({

@@ -53,6 +53,6 @@ cd "$DEST"
 
 say "Configuring everything (no questions — recommended defaults)"
 npm install --silent
-node bin/cli.js --express --project "$HOME/Desktop/Projects"
+node bin/cli.js --guided --project "$HOME/Desktop/Projects"
 
 printf "\n[OK] All set! Open the Claude app -> Code -> open Desktop/Projects -> type /om-standup\n\n"

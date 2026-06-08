@@ -22,7 +22,7 @@ export default {
   },
   async prompt(ctx) {
     const io = ctx.env.io;
-    if (ctx.env.express) {
+    if (ctx.env.express || ctx.env.guided) {
       const root = ctx.env.projectRoot || join(ctx.env.home, 'Desktop', 'Projects');
       return { projectDir: root, projectName: 'My Project', projectDesc: 'Configured with claude-onboard.', conventions: '' };
     }

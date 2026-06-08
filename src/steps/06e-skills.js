@@ -16,7 +16,7 @@ export default {
   },
   async prompt(ctx) {
     const io = ctx.env.io;
-    if (!io) return { wantSkills: true };
+    if (!io || ctx.env.guided) return { wantSkills: true };
     const wantSkills = await io.confirm({
       message: 'Install extra skills (llm-council + trading) and the om-* command suite?'
     });

@@ -1,4 +1,5 @@
 import { MARKETPLACES, CORE, OPTIONAL } from '../data/plugins.js';
+import { GOALS, pluginsForGoals } from '../data/goals.js';
 import { addMarketplace, installPlugin, pluginList } from '../lib/claude.js';
 import { parsePluginList } from '../lib/detect.js';
 import { check } from '../lib/verify.js';
@@ -17,7 +18,19 @@ export default {
   // prompt() is provided by the wizard UI layer; defaults to CORE.
   async prompt(ctx) {
     const io = ctx.env.io;
-    if (ctx.env.express) {
+    // Concierge: one friendly goal question -> mapped plugins (no jargon).
+    if (ctx.env.guided && io) {
+      try {
+        const goals = await io.multiselect({
+          message: 'What do you mostly want to do with Claude? (pick any - this tailors your setup)',
+          options: GOALS.map(g => ({ value: g.value, label: g.label })),
+          initialValues: ['build'], required: false
+        });
+        const chosen = Array.isArray(goals) && goals.length ? goals : ['explore'];
+        return { plugins: pluginsForGoals(chosen, CORE, OPTIONAL), goals: chosen };
+      } catch { /* terminal can't prompt (no-TTY pipe) -> fall through to recommended defaults */ }
+    }
+    if (ctx.env.express || ctx.env.guided) {
       const want = new Set(['elements-of-style', 'private-journal-mcp', 'obsidian']);
       return { plugins: [...CORE, ...OPTIONAL.filter(p => p.available && want.has(p.name))] };
     }

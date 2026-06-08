@@ -78,4 +78,17 @@ describe('end-to-end wizard run (fake io, fake run, temp dirs)', () => {
     expect(existsSync(join(proj, 'CLAUDE.md'))).toBe(true);
     expect(existsSync(join(proj, 'vault', 'brain', 'North Star.md'))).toBe(true);
   });
+
+  it('guided mode asks only the goal question and maps it to plugins', async () => {
+    const proj = join(dir, 'Desktop', 'Projects');
+    const run = async (cmd, args) => ({ ok: true, code: 0, stdout: (args && args[1] === 'list' ? '' : 'ok 1.0'), stderr: '' });
+    const io = { multiselect: async () => ['write'], text: async () => '', confirm: async () => true, select: async () => 'skip' };
+    const ctx = { env: { os: 'linux', pkgManager: 'apt', home: dir, stamp: 'S1', today: '2026-06-08', run, io, guided: true, projectRoot: proj }, answers: {}, results: {} };
+    const steps = [claudeCheck, prereqs, plugins, claudemd, hooks, secondbrain, northstar, qmd, mcpServers, skills, loops, summary];
+    const out = await runWizard(steps, ctx, { decide: async () => 'skip', ui: noUI() });
+    expect(out.aborted).toBe(false);
+    expect(ctx.answers.plugins.some(p => p.name === 'obsidian')).toBe(true);    // 'write' -> obsidian
+    expect(ctx.answers.plugins.some(p => p.name === 'superpowers')).toBe(true); // core always
+    expect(existsSync(join(proj, 'CLAUDE.md'))).toBe(true);
+  });
 });

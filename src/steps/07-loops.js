@@ -8,7 +8,7 @@ export default {
     return 'Optional: a recurring task. Note Claude\'s in-session /loop cannot be created from here, so we set up a real OS scheduled task that runs Claude on a schedule instead.';
   },
   async prompt(ctx) {
-    const io = ctx.env.io; if (!io) return { wantLoop: false };
+    const io = ctx.env.io; if (!io || ctx.env.guided) return { wantLoop: false };
     const wantLoop = await io.confirm({ message: 'Set up a daily scheduled Claude task? (optional)' });
     if (!wantLoop) return { wantLoop: false };
     const loopPrompt = (await io.text({ message: 'What should it run each day? (short prompt)' })) || 'daily standup';

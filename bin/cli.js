@@ -38,13 +38,14 @@ function today() {
 }
 
 const express = process.argv.includes('--express');
+const guided = process.argv.includes('--guided');
 const pIdx = process.argv.indexOf('--project');
 const projectRoot = pIdx >= 0 ? process.argv[pIdx + 1] : null;
-const ctx = await buildContext({ platform: process.platform, home: homedir(), stamp: stamp(), today: today(), run, io: express ? null : clackIo(), express, projectRoot });
+const ctx = await buildContext({ platform: process.platform, home: homedir(), stamp: stamp(), today: today(), run, io: express ? null : clackIo(), express, guided, projectRoot });
 const steps = [claudeCheck, prereqs, plugins, claudemd, hooks, secondbrain, northstar, qmd, mcpServers, skills, loops, summary];
 
 try {
-  const out = await runWizard(steps, ctx, { decide: express ? async () => 'skip' : decide, ui });
+  const out = await runWizard(steps, ctx, { decide: (express || guided) ? async () => 'skip' : decide, ui });
   if (!out.aborted) ui.note(renderSummary(out.results), 'Setup summary');
 } catch (e) {
   ui.log.error(`Something went wrong: ${e && e.message ? e.message : e}`);

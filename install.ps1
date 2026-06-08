@@ -57,8 +57,8 @@ if (Test-Path (Join-Path $dest '.git')) { git -C $dest pull --quiet }
 else { git clone --depth 1 https://github.com/nicholasanderson7419-afk/claude-onboard.git $dest }
 Set-Location $dest
 
-Section "Configuring everything (no questions - using recommended defaults)"
+Section "Setting up your Claude (one quick question to tailor it)"
 npm install --silent
-node bin/cli.js --express --project "$base"
+node bin/cli.js --guided --project "$base"
 
 Write-Host "`n[OK] All set!  Open the Claude app -> Code tab -> open '$base' -> type /om-standup`n" -ForegroundColor Green
