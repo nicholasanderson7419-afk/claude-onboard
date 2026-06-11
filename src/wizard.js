@@ -15,6 +15,8 @@ export async function runWizard(steps, ctx, { decide, ui }) {
       if (choice === 'retry') { res = await step.apply(ctx); continue; }
       if (choice === 'abort') { ui.outro('Aborted.'); return { ...ctx, aborted: true }; }
       ui.log.warn(`Skipped "${step.title}" — ${res.error || 'unknown error'}`);
+      // skipped steps must still show up in the final summary, with the reason
+      ctx.results[step.id] = { checks: [{ name: step.title, pass: false, proof: `skipped — ${res.error || 'unknown error'}` }] };
       break; // skip
     }
 

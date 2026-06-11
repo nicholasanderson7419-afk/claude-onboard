@@ -29,8 +29,10 @@ export default {
     changes.push(`qmd index created in ${indexDir}`);
 
     const add = await run('qmd', ['collection', 'add', '.'], { cwd: indexDir });
-    if (!add.ok) return { ok: false, changes, error: `qmd collection add failed: ${add.stderr}` };
-    changes.push('indexed markdown (**/*.md)');
+    if (!add.ok && !/already exists/i.test(`${add.stderr}${add.stdout}`)) {
+      return { ok: false, changes, error: `qmd collection add failed: ${add.stderr}` };
+    }
+    changes.push(add.ok ? 'indexed markdown (**/*.md)' : 'collection already indexed (re-run)');
 
     const m = await addMcp(run, 'qmd', 'user', ['qmd', 'mcp']);
     if (!m.ok) return { ok: false, changes, error: `register qmd MCP failed: ${m.stderr}` };
