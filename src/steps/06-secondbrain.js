@@ -56,13 +56,24 @@ export default {
       return { ok: false, changes: [], error: 'Please choose a dedicated vault folder, not your home or Desktop root (Claude would get write access to everything under it).' };
     }
     const changes = [];
+    // {{TODAY}} stamps seed notes; {{date}} is left intact (Obsidian Templates syntax).
+    const tpl = (rel) => readFileSync(join(tplDir, rel), 'utf8').replaceAll('{{TODAY}}', ctx.env.today || '');
     scaffoldTree(vaultPath, {
-      'brain/': null, 'wiki/concepts/': null, 'raw/': null, 'Templates/': null,
-      'MEMORY.md': readFileSync(join(tplDir, 'MEMORY.md'), 'utf8')
+      'brain/': null, 'projects/': null, 'wiki/concepts/': null, 'raw/': null, 'Templates/': null, 'archive/': null,
+      'MEMORY.md': tpl('MEMORY.md'),
+      'Home.md': tpl('Home.md'),
+      'brain/Key Decisions.md': tpl('brain/Key Decisions.md'),
+      'brain/Gotchas.md': tpl('brain/Gotchas.md'),
+      'brain/Patterns.md': tpl('brain/Patterns.md'),
+      'brain/Memories.md': tpl('brain/Memories.md'),
+      'brain/Skills.md': tpl('brain/Skills.md'),
+      'projects/_Project Template.md': tpl('projects/_Project Template.md'),
+      'Templates/Daily Note.md': tpl('Templates/Daily Note.md'),
+      'Templates/Meeting Note.md': tpl('Templates/Meeting Note.md')
     });
     // NOTE: North Star.md is intentionally NOT seeded here — Task 18b (North Star
     // interview) owns it. This step only creates the brain/ directory it lives in.
-    changes.push(`vault scaffolded at ${vaultPath}`);
+    changes.push(`vault scaffolded at ${vaultPath} (Home + brain/ + projects/ + wiki/ + raw/ + Templates/ + archive/)`);
 
     // Bundle the Obsidian community plugins (smart-connections, dataview, templater, mindmap, local-llm-helper)
     // into the vault so the second brain matches the reference setup. Code only — no personal data.json, no embeddings.

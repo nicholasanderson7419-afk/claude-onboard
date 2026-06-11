@@ -1,6 +1,7 @@
 // Obsidian color "vibe" picker. Each theme = a base mode (dark=obsidian / light=moonstone)
 // + a bundled CSS snippet that sets the accent via Obsidian's --accent-h/s/l variables.
 export const THEMES = [
+  { value: 'neural',  label: 'Neural Glow (dark) — signature', mode: 'obsidian',  snippet: 'neural-glow' },
   { value: 'clay',    label: 'Warm Clay (dark)',       mode: 'obsidian',  snippet: 'claude-clay' },
   { value: 'purple',  label: 'Midnight Purple (dark)', mode: 'obsidian',  snippet: 'midnight-purple' },
   { value: 'emerald', label: 'Emerald (dark)',         mode: 'obsidian',  snippet: 'emerald' },
@@ -8,7 +9,7 @@ export const THEMES = [
   { value: 'light',   label: 'Clean Light',            mode: 'moonstone', snippet: 'clean-light' },
 ];
 
-export const DEFAULT_THEME = 'clay';
+export const DEFAULT_THEME = 'neural';
 
 // -> the appearance.json the wizard writes for the chosen vibe.
 export function appearanceFor(value) {
