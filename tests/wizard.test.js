@@ -35,5 +35,5 @@ describe('runWizard', () => {
 });
 
 function noUI() {
-  return { intro(){}, outro(){}, note(){}, log: { step(){}, error(){}, success(){} } };
+  return { intro(){}, outro(){}, note(){}, log: { step(){}, error(){}, success(){}, warn(){} } };
 }

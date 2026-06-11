@@ -54,7 +54,8 @@ export default {
     for (const p of chosen) {
       const source = MARKETPLACES[p.marketplace];
       if (source && !seenMkts.has(p.marketplace)) {
-        await addMarketplace(ctx.env.run, source);
+        const mr = await addMarketplace(ctx.env.run, source);
+        if (!mr.ok) return { ok: false, changes, error: `add marketplace ${p.marketplace} failed: ${mr.stderr || mr.stdout || 'no output'}` };
         seenMkts.add(p.marketplace);
         changes.push(`marketplace: ${p.marketplace}`);
       }

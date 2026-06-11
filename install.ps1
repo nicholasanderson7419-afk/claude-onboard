@@ -60,5 +60,16 @@ Set-Location $dest
 Section "Setting up your Claude (one quick question to tailor it)"
 npm install --silent
 node bin/cli.js --guided --project "$base"
+$wizardExit = $LASTEXITCODE
+
+Section "Verifying installation"
+Write-Host "  Plugins installed:"
+$pluginOut = claude plugin list 2>&1 | Out-String
+if ($pluginOut -match '\S') { Write-Host $pluginOut } else { Write-Host "  (none - check errors above)" -ForegroundColor Yellow }
+
+if ($wizardExit -ne 0) {
+  Write-Host "`n[WARN] Setup wizard exited with code $wizardExit - some items may not have installed." -ForegroundColor Yellow
+  Write-Host "  Run 'claude plugin list' to check. If plugins are missing, re-run this installer." -ForegroundColor Yellow
+}
 
 Write-Host "`n[OK] All set!  Open the Claude app -> Code tab -> open '$base' -> type /om-standup`n" -ForegroundColor Green

@@ -4,7 +4,7 @@ export const ui = {
   intro: (t) => p.intro(t),
   outro: (t) => p.outro(t),
   note: (t, title) => p.note(t, title),
-  log: { step: (t) => p.log.step(t), error: (t) => p.log.error(t), success: (t) => p.log.success(t) }
+  log: { step: (t) => p.log.step(t), error: (t) => p.log.error(t), success: (t) => p.log.success(t), warn: (t) => p.log.warn(t) }
 };
 
 export async function decide(step, error) {
