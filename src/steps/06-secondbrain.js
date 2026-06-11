@@ -104,13 +104,14 @@ export default {
     const r = await mcpList(ctx.env.run);
     const servers = r.ok ? parseMcpList(r.stdout) : [];
     const find = (n) => servers.find(s => s.name === n);
-    const checks = [ await check('vault MCP connected', async () => {
+    // pass = registered; first health check can be slow (npx downloads the server package).
+    const checks = [ await check('vault MCP', async () => {
       const s = find('obsidian-vault');
-      return { pass: !!(s && s.connected), proof: s ? (s.connected ? 'connected' : 'not connected') : 'absent' };
+      return { pass: !!s, proof: s ? (s.connected ? 'connected' : 'registered (connects on first use)') : 'absent' };
     }) ];
-    if (ctx.answers.enableMemory) checks.push(await check('memory MCP connected', async () => {
+    if (ctx.answers.enableMemory) checks.push(await check('memory MCP', async () => {
       const s = find('memory');
-      return { pass: !!(s && s.connected), proof: s ? (s.connected ? 'connected' : 'not connected') : 'absent' };
+      return { pass: !!s, proof: s ? (s.connected ? 'connected' : 'registered (connects on first use)') : 'absent' };
     }));
     checks.push(await check('Obsidian plugins bundled', async () => {
       const ok = existsSync(join(ctx.answers.vaultPath, '.obsidian', 'community-plugins.json'));

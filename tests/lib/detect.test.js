@@ -83,4 +83,11 @@ broken: foo - ✗ Failed to connect`;
     expect(got).toContainEqual({ name: 'memory', connected: true });
     expect(got).toContainEqual({ name: 'broken', connected: false });
   });
+  it('handles heavy checkmark glyphs (✔/✘) used on some platforms', () => {
+    const heavy = `qmd: qmd mcp - ✔ Connected
+dead: foo - ✘ Failed to connect`;
+    const got = parseMcpList(heavy);
+    expect(got).toContainEqual({ name: 'qmd', connected: true });
+    expect(got).toContainEqual({ name: 'dead', connected: false });
+  });
 });

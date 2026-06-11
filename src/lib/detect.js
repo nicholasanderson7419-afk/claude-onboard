@@ -29,10 +29,11 @@ export function parsePluginList(stdout) {
 }
 
 export function parseMcpList(stdout) {
+  // claude mcp list marks status with ✓/✔ (connected) or ✗/✘ (failed) depending on version/platform.
   const out = [];
   for (const line of stdout.split(/\r?\n/)) {
-    const m = line.match(/^([\w:-]+):\s.*-\s*(✓ Connected|✗.*)$/);
-    if (m) out.push({ name: m[1], connected: m[2].startsWith('✓') });
+    const m = line.match(/^([\w:-]+):\s.*-\s*([✓✔]\s*Connected|[✗✘].*)$/u);
+    if (m) out.push({ name: m[1], connected: /^[✓✔]/u.test(m[2]) });
   }
   return out;
 }
