@@ -13,8 +13,17 @@ function Section($t) { Write-Host "`n>>> $t" -ForegroundColor Cyan }
 function Have($c) { [bool](Get-Command $c -ErrorAction SilentlyContinue) }
 function Fail($t) { Write-Host "`n[FAILED] $t" -ForegroundColor Red }
 function Refresh-Path {
-  # winget-installed Claude CLI lives in ~\.local\bin; node/git land on Machine PATH; winget shims in Links.
-  $extra = "$HOME\.local\bin;$env:LOCALAPPDATA\Microsoft\WinGet\Links"
+  # Hardcode known Git install locations so we find git even if the NSIS installer
+  # hasn't finished flushing its PATH writes to the registry yet (PS 5.1 race).
+  $gitPaths = @(
+    "$env:ProgramFiles\Git\cmd",
+    "$env:ProgramFiles\Git\bin",
+    "${env:ProgramFiles(x86)}\Git\cmd",
+    "$env:LOCALAPPDATA\Programs\Git\cmd"
+  ) -join ';'
+  $wingetLinks = "$env:LOCALAPPDATA\Microsoft\WinGet\Links"
+  $claudeBin   = "$HOME\.local\bin"
+  $extra = "$claudeBin;$wingetLinks;$gitPaths"
   $env:Path = $extra + ';' + [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' + [Environment]::GetEnvironmentVariable('Path', 'User')
 }
 
@@ -40,7 +49,10 @@ else { Install-Pkg 'Anthropic.ClaudeCode' 'Claude Code CLI' | Out-Null }
 if (Have node)   { Write-Host "  [OK] Node.js: already installed" -ForegroundColor Green }
 else { Install-Pkg 'OpenJS.NodeJS.LTS' 'Node.js LTS' | Out-Null }
 if (Have git)    { Write-Host "  [OK] Git: already installed" -ForegroundColor Green }
-else { Install-Pkg 'Git.Git' 'Git' | Out-Null }
+else {
+  Install-Pkg 'Git.Git' 'Git' | Out-Null
+  Start-Sleep -Seconds 3  # NSIS installer flushes PATH to registry async; give it a moment
+}
 Refresh-Path
 
 Section "Checking the tools are reachable"
