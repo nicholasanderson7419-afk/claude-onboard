@@ -53,6 +53,9 @@ else {
   Install-Pkg 'Git.Git' 'Git' | Out-Null
   Start-Sleep -Seconds 3  # NSIS installer flushes PATH to registry async; give it a moment
 }
+# Python: several ECC library skills shell out to python scripts.
+if (Have python) { Write-Host "  [OK] Python: already installed" -ForegroundColor Green }
+else { Install-Pkg 'Python.Python.3.12' 'Python 3.12' | Out-Null }
 Refresh-Path
 
 Section "Checking the tools are reachable"
