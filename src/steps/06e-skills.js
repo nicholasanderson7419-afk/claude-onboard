@@ -7,7 +7,7 @@ import { copyTree } from '../lib/writers.js';
 import { check } from '../lib/verify.js';
 
 const assetsDir = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'assets');
-const FULL_SET = { council: true, omCommands: true };
+const FULL_SET = { council: true, omCommands: true, bundled: [...BUNDLED_SKILLS] };
 
 export default {
   id: 'skills',
@@ -23,7 +23,11 @@ export default {
       const set = skillsForGoals(ctx.answers.goals);
       return {
         wantSkills: set.size > 0,
-        skills: { council: set.has('llm-council'), omCommands: set.has('om-commands') }
+        skills: {
+          council: set.has('llm-council'),
+          omCommands: set.has('om-commands'),
+          bundled: BUNDLED_SKILLS.filter(n => set.has(n))
+        }
       };
     }
     // express, guided-with-no-answerable-goal (no-TTY), or no UI -> sensible full set
@@ -50,9 +54,8 @@ export default {
       changes.push(`cloned skill: ${s.name}`);
     }
 
-    // 2. bundled skills -> ~/.claude/skills/<name>
-    //    (none after the trading skills were removed; loop kept for future general skills)
-    for (const name of BUNDLED_SKILLS) {
+    // 2. bundled skills -> ~/.claude/skills/<name> — gated by goal selection
+    for (const name of (sel.bundled ?? BUNDLED_SKILLS)) {
       const res = copyTree(join(assetsDir, 'skills', name), join(skillsRoot, name));
       changes.push(res.skipped ? `skill ${name}: already present` : `installed skill: ${name}`);
     }
@@ -86,7 +89,7 @@ export default {
         return { pass: ok, proof: ok ? 'present' : 'absent (clone may need network)' };
       }));
     }
-    for (const name of BUNDLED_SKILLS) {
+    for (const name of (sel.bundled ?? BUNDLED_SKILLS)) {
       checks.push(await check(`skill ${name}`, async () => {
         const ok = existsSync(join(skillsRoot, name, 'SKILL.md'));
         return { pass: ok, proof: ok ? 'SKILL.md present' : 'absent' };

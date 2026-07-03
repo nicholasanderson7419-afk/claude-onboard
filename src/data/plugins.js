@@ -4,12 +4,17 @@ export const MARKETPLACES = {
   'trailofbits': 'trailofbits/skills',
   'claude-plugins-official': 'anthropics/claude-plugins-official',
   'claude-video-vision': 'https://github.com/jordanrendric/claude-video-vision.git',
-  'obsidian-skills': 'kepano/obsidian-skills'
+  'obsidian-skills': 'kepano/obsidian-skills',
+  // Everything Claude Code (affaan-m/ECC): one `ecc` plugin at repo root —
+  // 277 skills, 92 commands, 67 agents. Its plugin.json wires skills+commands
+  // only (NO hooks), so no third-party shell execution is auto-enabled.
+  'ecc': 'affaan-m/everything-claude-code'
 };
 
 export const CORE = [
   { name: 'superpowers', marketplace: 'superpowers-marketplace' },
   { name: 'caveman', marketplace: 'caveman' },
+  { name: 'ecc', marketplace: 'ecc' },
   { name: 'claude-session-driver', marketplace: 'superpowers-marketplace' },
   { name: 'double-shot-latte', marketplace: 'superpowers-marketplace' },
   { name: 'ask-questions-if-underspecified', marketplace: 'trailofbits' },

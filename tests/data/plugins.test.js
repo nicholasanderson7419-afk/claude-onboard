@@ -2,19 +2,20 @@ import { describe, it, expect } from 'vitest';
 import { MARKETPLACES, CORE, OPTIONAL } from '../../src/data/plugins.js';
 
 describe('plugin data', () => {
-  it('has 6 known marketplace sources, all resolvable (no null)', () => {
+  it('has 7 known marketplace sources, all resolvable (no null)', () => {
     expect(MARKETPLACES['superpowers-marketplace']).toBe('obra/superpowers-marketplace');
     expect(MARKETPLACES['caveman']).toBe('JuliusBrussee/caveman');
     expect(MARKETPLACES['trailofbits']).toBe('trailofbits/skills');
     expect(MARKETPLACES['claude-plugins-official']).toBe('anthropics/claude-plugins-official');
     expect(MARKETPLACES['claude-video-vision']).toBe('https://github.com/jordanrendric/claude-video-vision.git');
     expect(MARKETPLACES['obsidian-skills']).toBe('kepano/obsidian-skills');
+    expect(MARKETPLACES['ecc']).toBe('affaan-m/everything-claude-code');
     expect(Object.values(MARKETPLACES).every(v => typeof v === 'string' && v.length > 0)).toBe(true);
   });
 
-  it('core 6 are the agreed defaults', () => {
+  it('core 7 are the agreed defaults (incl. the full ECC library)', () => {
     expect(CORE.map(p => p.name).sort()).toEqual(
-      ['ask-questions-if-underspecified', 'caveman', 'claude-session-driver', 'debug-buttercup', 'double-shot-latte', 'superpowers'].sort()
+      ['ask-questions-if-underspecified', 'caveman', 'claude-session-driver', 'debug-buttercup', 'double-shot-latte', 'ecc', 'superpowers'].sort()
     );
   });
 

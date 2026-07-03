@@ -10,6 +10,11 @@ export const GOALS = [
   { value: 'build',    label: 'Build websites & apps',         extras: ['gh-cli', 'code-review'],                                mcp: ['playwright'],           skills: ['llm-council'] },
   { value: 'write',    label: 'Write, research & take notes',  extras: ['elements-of-style', 'private-journal-mcp', 'obsidian'], mcp: [],                       skills: ['llm-council', 'om-commands'] },
   { value: 'automate', label: 'Automate repetitive tasks',     extras: ['gh-cli'],                                               mcp: ['ruflo', 'claude-flow'], skills: [] },
+  // Gmail is NOT an MCP entry here on purpose: every self-hosted Gmail MCP requires the end
+  // user to create Google Cloud OAuth credentials. The email-assistant skill instead uses the
+  // first-party claude.ai Gmail connector (Settings -> Connectors -> Gmail, one click) and
+  // self-checks for it at point of use.
+  { value: 'realestate', label: 'Run my real estate business', extras: ['elements-of-style', 'obsidian'],                        mcp: [],                       skills: ['real-estate', 'email-assistant', 'om-commands'] },
   { value: 'explore',  label: "Just exploring / not sure yet", extras: [],                                                       mcp: [],                       skills: [] },
 ];
 

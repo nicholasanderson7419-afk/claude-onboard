@@ -8,8 +8,8 @@ describe('skills data', () => {
     expect(c.repo).toBe('https://github.com/tenfoldmarc/llm-council-skill');
   });
 
-  it('no longer bundles the trading skills (pulled from the sold product 2026-06-08)', () => {
-    expect(BUNDLED_SKILLS).toEqual([]);
+  it('bundles exactly the two real-estate agents and no trading skills (pulled 2026-06-08)', () => {
+    expect([...BUNDLED_SKILLS].sort()).toEqual(['email-assistant', 'real-estate']);
     for (const t of [
       'ito-basket-compare', 'ito-data-atlas-agent', 'ito-market-intelligence', 'ito-trade-planner',
       'llm-trading-agent-security', 'prediction-market-oracle-research', 'prediction-market-risk-review'

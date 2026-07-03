@@ -26,6 +26,18 @@ describe('goals -> plugins concierge mapping', () => {
     expect(pluginsForGoals(['explore'], CORE, OPTIONAL).length).toBe(CORE.length);
   });
 
+  it('"realestate" adds elements-of-style + obsidian and implies both agents + om-commands', () => {
+    const got = pluginsForGoals(['realestate'], CORE, OPTIONAL).map(p => p.name);
+    expect(got).toContain('elements-of-style');
+    expect(got).toContain('obsidian');
+    const skills = skillsForGoals(['realestate']);
+    expect(skills.has('real-estate')).toBe(true);
+    expect(skills.has('email-assistant')).toBe(true);
+    expect(skills.has('om-commands')).toBe(true);
+    // deliberately NO mcp entry: Gmail rides the first-party claude.ai connector
+    expect(mcpForGoals(['realestate'], MCP_SERVERS)).toEqual([]);
+  });
+
   it('unions extras across multiple goals with no duplicates', () => {
     const got = pluginsForGoals(['build', 'write'], CORE, OPTIONAL).map(p => p.name);
     expect(got).toContain('gh-cli');
@@ -85,7 +97,7 @@ describe('goals -> MCP + skills concierge mapping', () => {
   });
 
   it('skill tokens are limited to the known set', () => {
-    const known = new Set(['llm-council', 'om-commands']);
+    const known = new Set(['llm-council', 'om-commands', 'real-estate', 'email-assistant']);
     for (const g of GOALS) for (const s of (g.skills || [])) expect(known.has(s), `${g.value} -> ${s}`).toBe(true);
   });
 });

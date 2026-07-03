@@ -19,7 +19,11 @@ export const CLONE_SKILLS = [
   }
 ];
 
-export const BUNDLED_SKILLS = [];
+// real-estate: residential+commercial agent workflows + unit-tested calc helpers.
+// email-assistant: Gmail triage/summarize/draft via the first-party claude.ai
+// Gmail connector (drafts only — the connector exposes no send tool).
+// Both implied by the 'realestate' goal; installed by default outside guided mode.
+export const BUNDLED_SKILLS = ['real-estate', 'email-assistant'];
 
 export const BUNDLED_COMMANDS = [
   'om-capture-1on1.md', 'om-dump.md', 'om-humanize.md', 'om-incident-capture.md',

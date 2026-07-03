@@ -75,11 +75,40 @@ describe('step 06e skills', () => {
     const proj = join(dir, 'proj');
     const ctx = { env: { home: dir, run, guided: true, io: {} }, answers: { goals: ['build'], projectDir: proj }, results: {} };
     const sel = await step.prompt(ctx);
-    expect(sel.skills).toEqual({ council: true, omCommands: false });
+    expect(sel.skills).toEqual({ council: true, omCommands: false, bundled: [] });
     Object.assign(ctx.answers, sel);
     await step.apply(ctx);
     expect(existsSync(join(dir, '.claude', 'skills', 'llm-council', 'SKILL.md'))).toBe(true);
     expect(existsSync(join(proj, '.claude', 'commands', 'om-dump.md'))).toBe(false);
+  });
+
+  it('guided "realestate" -> real-estate + email-assistant skills + om-* commands, no council', async () => {
+    const { run, calls } = fakeRunCloning();
+    const proj = join(dir, 'proj');
+    const ctx = { env: { home: dir, run, guided: true, io: {} }, answers: { goals: ['realestate'], projectDir: proj }, results: {} };
+    const sel = await step.prompt(ctx);
+    expect(sel.wantSkills).toBe(true);
+    expect(sel.skills.bundled.sort()).toEqual(['email-assistant', 'real-estate']);
+    Object.assign(ctx.answers, sel);
+    const res = await step.apply(ctx);
+    expect(res.ok).toBe(true);
+    expect(existsSync(join(dir, '.claude', 'skills', 'real-estate', 'SKILL.md'))).toBe(true);
+    expect(existsSync(join(dir, '.claude', 'skills', 'real-estate', 'scripts', 'calc.mjs'))).toBe(true);
+    expect(existsSync(join(dir, '.claude', 'skills', 'email-assistant', 'SKILL.md'))).toBe(true);
+    expect(existsSync(join(proj, '.claude', 'commands', 'om-dump.md'))).toBe(true);
+    expect(calls.some(c => c.includes('llm-council'))).toBe(false); // council not implied
+    const v = await step.verify(ctx);
+    expect(v.checks.every(c => c.pass)).toBe(true);
+  });
+
+  it('guided "build" -> NO bundled real-estate skills installed', async () => {
+    const { run } = fakeRunCloning();
+    const proj = join(dir, 'proj');
+    const ctx = { env: { home: dir, run, guided: true, io: {} }, answers: { goals: ['build'], projectDir: proj }, results: {} };
+    Object.assign(ctx.answers, await step.prompt(ctx));
+    await step.apply(ctx);
+    expect(existsSync(join(dir, '.claude', 'skills', 'real-estate'))).toBe(false);
+    expect(existsSync(join(dir, '.claude', 'skills', 'email-assistant'))).toBe(false);
   });
 
   it('guided "automate" -> no skills installed at all', async () => {

@@ -42,7 +42,7 @@ function Install-Pkg($id, $label) {
 Write-Host "`n=== claude-onboard: all-in-one Claude setup ===" -ForegroundColor Green
 
 Section "Installing apps (winget - can take a few minutes)"
-Install-Pkg 'Anthropic.Claude'     'Claude desktop app' | Out-Null
+Write-Host "  [SKIP] Claude desktop app - you already have it installed" -ForegroundColor Green
 Install-Pkg 'Obsidian.Obsidian'    'Obsidian (notes app)' | Out-Null
 if (Have claude) { Write-Host "  [OK] Claude Code CLI: already installed" -ForegroundColor Green }
 else { Install-Pkg 'Anthropic.ClaudeCode' 'Claude Code CLI' | Out-Null }
@@ -76,7 +76,19 @@ if (-not (Test-ClaudeAuth)) {
   Fail "Not signed in. Run 'claude auth login' (needs a Claude Pro/Max/Team plan), then paste the install line again."
   return
 }
-Write-Host "  signed in." -ForegroundColor Green
+# Plan gate: the plugin/skill stack needs a paid plan. `claude auth status` reports
+# subscriptionType (e.g. "max") for claude.ai logins.
+$authOut = claude auth status 2>&1 | Out-String
+if ($authOut -match '"subscriptionType"\s*:\s*"([^"]+)"') {
+  $plan = $Matches[1]
+  if ($plan -eq 'free') {
+    Fail "This account is on the FREE plan. The setup needs Claude Pro or Max. Upgrade at claude.ai/upgrade, then paste the install line again."
+    return
+  }
+  Write-Host "  signed in (plan: $plan)." -ForegroundColor Green
+} else {
+  Write-Host "  signed in. [WARN] could not confirm plan tier - if plugins fail to install, check that this account has Pro or Max." -ForegroundColor Yellow
+}
 
 Section "Getting the setup"
 $desktop = [Environment]::GetFolderPath('Desktop')   # OneDrive-aware real Desktop
@@ -109,4 +121,5 @@ if ($wizardExit -ne 0) {
   Write-Host "  Run 'claude plugin list' to check. If plugins are missing, re-run this installer." -ForegroundColor Yellow
 }
 
-Write-Host "`n[OK] All set!  Open the Claude app -> Code tab -> open '$base' -> start talking. Your vault is at '$base\vault' - open it in Obsidian once and click 'Enable community plugins'.`n" -ForegroundColor Green
+Write-Host "`n[OK] All set!  Open the Claude app -> Code tab -> open '$base' -> start talking. Your vault is at '$base\vault' - open it in Obsidian once and click 'Enable community plugins'." -ForegroundColor Green
+Write-Host "One more thing for email: go to claude.ai -> Settings -> Connectors -> connect Gmail (one click). That gives your email assistant inbox access.`n" -ForegroundColor Cyan
